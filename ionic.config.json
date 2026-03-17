@@ -1,0 +1,7 @@
+{
+  "name": "Projeto-iv",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}
