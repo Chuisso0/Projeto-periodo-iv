@@ -1,0 +1,19 @@
+ion-content {
+    --background: black;
+}
+
+ion-button {
+    --background: #6803c7;
+    font-family: monospace;
+    color: white;
+}
+
+.boas-vindas {
+    font-family: monospace;
+    display: flex;
+    flex-direction: column;
+    justify-content: baseline;
+    align-items: center;
+    height: 100%;
+    color: white;
+}

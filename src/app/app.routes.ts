@@ -21,4 +21,20 @@ export const routes: Routes = [
     path: 'tab4',
     loadComponent: () => import('./tab4/tab4.page').then( m => m.Tab4Page)
   },
+  {
+    path: 'welcome',
+    loadComponent: () => import('./pages/welcome/welcome.page').then( m => m.WelcomePage)
+  },
+  {
+    path: 'login',
+    loadComponent: () => import('./pages/login/login.page').then( m => m.LoginPage)
+  },
+  {
+    path: 'cadastro',
+    loadComponent: () => import('./pages/cadastro/cadastro.page').then( m => m.CadastroPage)
+  },
+  {
+    path: 'forgot-password',
+    loadComponent: () => import('./forgot-password/forgot-password.page').then( m => m.ForgotPasswordPage)
+  },
 ];

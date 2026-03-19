@@ -1,0 +1,44 @@
+ion-content {
+    --background: black;
+}
+
+h3 {
+    font-family: monospace;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+
+}
+
+ion-item {
+    --background: transparent;
+    color: white;
+    font-family: monospace;
+    width: 80%;
+    margin-top: 60px;
+
+
+}
+
+a {
+    color: white;
+    font-family: monospace;
+    align-self: flex-start;
+    padding-left: 15%;
+    padding-top: 15px;
+
+}
+
+ion-button {
+    --highlight-color-focused: #6803c7;
+    --background: #6803c7;
+    font-family: monospace;
+    color: white;
+    margin-top: 70px;
+    width: 80%;
+}
