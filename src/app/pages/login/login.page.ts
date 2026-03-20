@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonContent, IonButton, IonHeader, IonTitle, IonToolbar, IonItem, IonInput, IonLabel } from '@ionic/angular/standalone';
+import { Router, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -12,9 +13,14 @@ import { IonContent, IonButton, IonHeader, IonTitle, IonToolbar, IonItem, IonInp
 })
 export class LoginPage implements OnInit {
 
-  constructor() { }
+  constructor(private router: Router) { }
 
   ngOnInit() {
+  }
+
+  fazerLogin() {
+
+    this.router.navigate(['/tabs/tab1']);
   }
 
 }
