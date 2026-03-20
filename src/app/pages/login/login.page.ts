@@ -9,7 +9,7 @@ import { Router, RouterModule } from '@angular/router';
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.scss'],
   standalone: true,
-  imports: [IonContent, IonItem, IonButton, IonInput, CommonModule, FormsModule]
+  imports: [IonContent, IonItem, IonButton, IonInput, CommonModule, FormsModule, RouterModule]
 })
 export class LoginPage implements OnInit {
 

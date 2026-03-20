@@ -19,22 +19,26 @@ export const routes: Routes = [
   },
   {
     path: 'tab4',
-    loadComponent: () => import('./tab4/tab4.page').then( m => m.Tab4Page)
+    loadComponent: () => import('./tab4/tab4.page').then(m => m.Tab4Page)
   },
   {
     path: 'welcome',
-    loadComponent: () => import('./pages/welcome/welcome.page').then( m => m.WelcomePage)
+    loadComponent: () => import('./pages/welcome/welcome.page').then(m => m.WelcomePage)
   },
   {
     path: 'login',
-    loadComponent: () => import('./pages/login/login.page').then( m => m.LoginPage)
+    loadComponent: () => import('./pages/login/login.page').then(m => m.LoginPage)
   },
   {
     path: 'cadastro',
-    loadComponent: () => import('./pages/cadastro/cadastro.page').then( m => m.CadastroPage)
+    loadComponent: () => import('./pages/cadastro/cadastro.page').then(m => m.CadastroPage)
   },
   {
     path: 'forgot-password',
-    loadComponent: () => import('./forgot-password/forgot-password.page').then( m => m.ForgotPasswordPage)
+    loadComponent: () => import('./pages/forgot-password/forgot-password.page').then(m => m.ForgotPasswordPage)
+  },
+  {
+    path: 'nova-senha',
+    loadComponent: () => import('./pages/nova-senha/nova-senha.page').then(m => m.NovaSenhaPage)
   },
 ];
