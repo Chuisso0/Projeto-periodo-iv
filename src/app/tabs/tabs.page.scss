@@ -1,1 +1,26 @@
+ion-tab-bar {
+    --background: rgba(0, 0, 0, 0.651);
+    backdrop-filter: blur(2px);
 
+    --border: none;
+}
+
+ion-tab-button {
+    --color: white;
+    --color-selected: #6803c7;
+    --ripple-color: transparent;
+}
+
+ion-tab-button ion-icon {
+    transition: transform 0.1s ease-in-out;
+}
+
+ion-tab-button:active ion-icon {
+    transform: scale(0.9);
+}
+
+ion-label {
+    color: rgba(255, 255, 255, 0.446);
+    font-family: monospace;
+    font-size: 9px;
+}

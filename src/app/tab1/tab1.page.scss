@@ -1,0 +1,189 @@
+/* =========================================
+   1. CONFIGURAÇÕES GERAIS DA PÁGINA
+   ========================================= */
+ion-content {
+    --background: black;
+    color: white;
+}
+
+h2 {
+    font-family: monospace;
+    margin-top: 40px;
+    padding-left: 15px;
+    font-size: 1.2rem;
+}
+
+h3 {
+    font-family: monospace;
+    padding-left: 15px;
+    margin-top: 30px;
+    font-size: 1rem;
+    color: white;
+}
+
+/* =========================================
+   2. CARD DE DESTAQUE (Lançamento)
+   ========================================= */
+#lancamento {
+    position: relative;
+    width: 90%;
+    margin: 0 auto;
+    border-radius: 5px;
+    /* Seu ajuste de borda */
+    overflow: hidden;
+}
+
+#lancamento img {
+    width: 100%;
+    display: block;
+}
+
+.info {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0) 100%);
+}
+
+.info h3 {
+    padding-left: 0;
+    margin: 0;
+    font-family: monospace;
+    font-size: 1.3rem;
+    color: white;
+}
+
+.info h4 {
+    margin: 5px 0 0 0;
+    font-family: monospace;
+    color: #dfb706;
+    /* Seu ajuste de cor amarela/dourada! */
+}
+
+/* =========================================
+   3. CARROSSEL DE LISTAS (Os jogos menores)
+   ========================================= */
+.listas {
+    display: flex;
+    overflow-x: auto;
+    gap: 15px;
+    padding: 0 15px;
+}
+
+.listas::-webkit-scrollbar {
+    display: none;
+}
+
+/* O sinal de '>' garante que as divs de texto de dentro não quebrem! */
+.listas>div {
+    position: relative;
+    flex: 0 0 auto;
+    width: 70vw;
+    /* Sua largura customizada */
+    display: flex;
+    flex-direction: column;
+}
+
+.listas>div::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 120px;
+    /* A exata mesma altura da sua imagem! */
+
+    /* O seu gradiente de escuro para transparente */
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0) 100%);
+
+    border-radius: 5px;
+    /* Acompanha a bordinha que você fez na imagem */
+    pointer-events: none;
+    /* Muito importante: impede que o gradiente bloqueie os cliques no jogo! */
+}
+
+.listas img {
+    height: 120px;
+    /* Sua altura customizada */
+    width: 100%;
+    object-fit: cover;
+    border-radius: 5px;
+
+    /* Seu ajuste de borda */
+}
+
+.tit-list {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-top: 30px;
+    /* O espaçamento agora fica só na caixa de fora */
+    padding-right: 15px;
+    /* Dá o mesmo espaço na direita para o link não colar na tela */
+}
+
+/* Tira a margem do h3 para ele não empurrar o layout pra baixo */
+.tit-list h3 {
+    margin-top: 0;
+}
+
+.tit-list a {
+    font-family: monospace;
+    color: rgba(255, 255, 255, 0.446);
+    text-decoration: none;
+    font-size: 0.8rem;
+    /* Dá uma leve diminuída no link pra dar destaque ao Título */
+}
+
+/* =========================================
+   4. INFORMAÇÕES ABAIXO DA IMAGEM (Textos e Coração)
+   ========================================= */
+.info-jogo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.textos {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 75%;
+}
+
+.textos h4 {
+    margin: 0;
+    font-family: monospace;
+    color: white;
+    font-size: 1rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+}
+
+.textos h5 {
+    margin: 5px 0 0 0;
+    font-family: monospace;
+    color: #dfb706;
+    /* Preço em roxo */
+    font-size: 0.9rem;
+}
+
+.info-jogo ion-icon {
+    color: white;
+    font-size: 1.5rem;
+}
+
+/* =========================================
+   5. CLASSES EXTRAS (Do seu código)
+   ========================================= */
+.list {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+}
