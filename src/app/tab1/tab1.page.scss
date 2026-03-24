@@ -7,7 +7,7 @@ ion-content {
 }
 
 h2 {
-    font-family: monospace;
+    font-family: -apple-system, BlinkMacSystemFont, "Roboto", "Helvetica Neue", sans-serif;
     margin-top: 40px;
     padding-left: 15px;
     font-size: 1.2rem;
@@ -21,45 +21,79 @@ h3 {
     color: white;
 }
 
+h5 {
+    font-size: .7rem;
+}
+
+/* =========================================
+   2. CARD DE DESTAQUE (Lançamento)
+   ========================================= */
 /* =========================================
    2. CARD DE DESTAQUE (Lançamento)
    ========================================= */
 #lancamento {
     position: relative;
-    width: 90%;
+    width: 100%;
     margin: 0 auto;
-    border-radius: 5px;
-    /* Seu ajuste de borda */
+    border-radius: 0px;
+    /* Mantemos 0 para colar na tela igual o print */
     overflow: hidden;
 }
 
 #lancamento img {
     width: 100%;
+    height: 48vh;
+    /* Dá uma altura boa pra imagem não ficar gigante nem achatada */
+    object-fit: cover;
+    /* Corta a imagem perfeitamente */
     display: block;
 }
 
+/* O Gradiente arrumado e mais alto */
 .info {
     position: absolute;
     bottom: 0;
     left: 0;
     width: 100%;
-    padding: 15px;
-    background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0) 100%);
+    padding: 30px 15px 15px 15px;
+    /* Mais espaço no topo pra o gradiente sumir devagar */
+    background: linear-gradient(to top, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.6) 50%, rgba(0, 0, 0, 0) 100%);
+    display: flex;
+    flex-direction: column;
 }
 
+/* "Lançamento Destaque:" */
+.info h5 {
+    margin: 0 0 2px 0;
+    /* Cola pertinho do título do jogo */
+    font-family: -apple-system, BlinkMacSystemFont, "Roboto", "Helvetica Neue", sans-serif;
+    /* Usando sans-serif pra ficar igual a foto */
+    color: white;
+    font-size: 0.9rem;
+    font-weight: 600;
+    /* Deixa a fonte mais gordinha */
+}
+
+/* "Joguinho 1" */
 .info h3 {
     padding-left: 0;
     margin: 0;
-    font-family: monospace;
-    font-size: 1.3rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Roboto", "Helvetica Neue", sans-serif;
+    /* Usando sans-serif pra ficar igual a foto */
+    font-size: 1.8rem;
+    /* Bem grande e imponente */
+    font-weight: bold;
     color: white;
 }
 
+/* "R$500" */
 .info h4 {
     margin: 5px 0 0 0;
-    font-family: monospace;
+    font-family: -apple-system, BlinkMacSystemFont, "Roboto", "Helvetica Neue", sans-serif;
     color: #dfb706;
-    /* Seu ajuste de cor amarela/dourada! */
+    /* O seu dourado perfeito! */
+    font-size: 1.1rem;
+    font-weight: bold;
 }
 
 /* =========================================

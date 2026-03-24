@@ -1,13 +1,18 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>tab4</ion-title>
-  </ion-toolbar>
-</ion-header>
-
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">tab4</ion-title>
-    </ion-toolbar>
-  </ion-header>
+
+  <div id="perfil-header">
+    <ion-avatar>
+      <img src="../../assets/images/perfil.png" alt="Foto de Perfil">
+    </ion-avatar>
+
+    <h3>NOMEUSER</h3>
+    <p>EMAILEMAIL@EMAIL.COM</p>
+
+  </div>
+
+  <div class="botoes-acao">
+    <ion-button routerLink="/login" class="btn-opcao">Configuração</ion-button>
+    <ion-button routerLink="/cadastro" class="btn-opcao btn-sair">Sair da conta</ion-button>
+  </div>
+
 </ion-content>

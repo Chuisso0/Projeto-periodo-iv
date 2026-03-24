@@ -20,4 +20,13 @@ export class Tab2Page {
     });
   }
 
+  pesquisarJogo(termo: string | number | null | undefined) {
+    if (termo) {
+      alert('Pesquisando por:' + termo);
+      // Aqui você pode adicionar a lógica para realizar a pesquisa, como chamar um serviço ou filtrar uma lista de jogos.
+    } else {
+      alert('Campo de pesquisa vazio');
+    }
+  }
+
 }

@@ -1,8 +1,9 @@
 <ion-content [fullscreen]="true">
 
-  <ion-item class="barra-pesquisa">
-    <ion-input placeholder="Pesquisar"></ion-input>
-    <ion-icon name="search-Outline" slot="end"></ion-icon>
+  <ion-item class="barra-pesquisa" lines="none">
+    <ion-input #campoBusca placeholder="Pesquisar"></ion-input>
+
+    <ion-icon name="search-outline" slot="end" (click)="pesquisarJogo(campoBusca.value)"></ion-icon>
   </ion-item>
 
 </ion-content>
