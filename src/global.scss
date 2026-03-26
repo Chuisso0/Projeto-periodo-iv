@@ -35,3 +35,10 @@
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import '@ionic/angular/css/palettes/dark.system.css';
+
+ion-alert.meu-alerta-customizado {
+    --background: #000000;
+    --color: #fff;
+    --border-radius: 10px;
+    --box-shadow: 0 4px 8px #a64de8;
+}

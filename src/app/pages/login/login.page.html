@@ -1,22 +1,18 @@
 <ion-content [fullscreen]="true">
-
-
-
   <div class="form">
-
     <h3>Entrar</h3>
     <ion-item>
-
-      <ion-input type="text" placeholder="Login"></ion-input>
+      <!-- Adicionamos o ngModel para capturar o login -->
+      <ion-input type="email" placeholder="E-mail" [(ngModel)]="email"></ion-input>
     </ion-item>
+
     <ion-item>
-
-      <ion-input type="password" placeholder="Senha"></ion-input>
+      <!-- Adicionamos o ngModel para capturar a senha -->
+      <ion-input type="password" placeholder="Senha" [(ngModel)]="password"></ion-input>
     </ion-item>
+
     <a routerLink="/forgot-password">Esqueceu a senha?</a>
 
     <ion-button (click)="fazerLogin()">Entrar</ion-button>
   </div>
-
-
 </ion-content>

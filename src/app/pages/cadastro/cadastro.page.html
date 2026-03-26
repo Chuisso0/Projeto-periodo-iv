@@ -1,31 +1,26 @@
 <ion-content [fullscreen]="true">
-
   <div class="form">
-
     <h3>Cadastrar</h3>
-    <ion-item>
 
-      <ion-input placeholder="Login"></ion-input>
+    <!-- O Firebase Auth usa E-mail como identificador principal -->
+
+    <ion-item>
+      <ion-input placeholder="Nome de Usuário" [(ngModel)]="nomeUsuario"></ion-input>
     </ion-item>
 
     <ion-item>
-
-      <ion-input type="email" placeholder="Email"></ion-input>
+      <ion-input type="email" placeholder="Email" [(ngModel)]="email"></ion-input>
     </ion-item>
 
     <ion-item>
-
-      <ion-input type="password" placeholder="Senha"></ion-input>
+      <ion-input type="password" placeholder="Senha" [(ngModel)]="password"></ion-input>
     </ion-item>
 
     <ion-item>
-
-      <ion-input type="password" placeholder="Confirmar Senha"></ion-input>
+      <ion-input type="password" placeholder="Confirmar Senha" [(ngModel)]="confirmPassword"></ion-input>
     </ion-item>
 
-    <ion-button routerLink="/login">Cadastrar</ion-button>
-
+    <!-- Tiramos o routerLink e colocamos o (click) -->
+    <ion-button (click)="cadastrar()">Finalizar Cadastro</ion-button>
   </div>
-
-
 </ion-content>

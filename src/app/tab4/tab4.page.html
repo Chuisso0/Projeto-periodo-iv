@@ -5,14 +5,17 @@
       <img src="../../assets/images/perfil.png" alt="Foto de Perfil">
     </ion-avatar>
 
-    <h3>NOMEUSER</h3>
-    <p>EMAILEMAIL@EMAIL.COM</p>
+    <!-- Aqui a mágica acontece: trocamos o texto fixo pelas variáveis -->
+    <h3>{{ nome }}</h3>
+    <p>{{ email }}</p>
 
   </div>
 
   <div class="botoes-acao">
     <ion-button routerLink="/login" class="btn-opcao">Configuração</ion-button>
-    <ion-button routerLink="/cadastro" class="btn-opcao btn-sair">Sair da conta</ion-button>
+
+    <!-- Trocamos o routerLink pelo (click) chamando a nossa função de Sair -->
+    <ion-button (click)="sair()" class="btn-opcao btn-sair">Sair da conta</ion-button>
   </div>
 
 </ion-content>
