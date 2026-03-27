@@ -1,159 +1,51 @@
 <ion-content [fullscreen]="true">
 
-  <div id="lancamento">
-    <img src="../../assets/images/26b30a7f16b20c714d782e60910788ce.jpg" alt="">
+  <div id="lancamento" *ngIf="jogoBanner">
+    <img [src]="jogoBanner.background_image" [alt]="jogoBanner.name">
     <div class="info">
-      <h5>Lançamento em destaque:</h5>
-      <h3>Joguinho1</h3>
-      <h4>R$500</h4>
+      <!-- Div para alinhar o texto e o coração -->
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h5 style="color: #ffd900f8; font-weight: bold;">DESTAQUE RECENTE</h5>
+        <ion-icon name="heart-outline" style="font-size: 24px; color: white;"></ion-icon>
+      </div>
+
+      <h3>{{ jogoBanner.name }}</h3>
+
+      <ion-badge color="none">
+        {{ jogoBanner.metacritic ? 'Nota: ' + jogoBanner.metacritic : '🔥 Hype' }}
+      </ion-badge>
     </div>
   </div>
 
-  <h3>Jogos mais vendidos</h3>
+  <h3 class="ion-padding-horizontal">🚀 Mais Aguardados</h3>
   <div class="listas">
-    <div>
-      <img src="../../assets/images/f42de69101cc58f6efae923254b34907.jpg" alt="">
+    <div class="card-jogo" *ngFor="let jogo of listaAguardados">
+      <img [src]="jogo.background_image" [alt]="jogo.name">
       <div class="info-jogo">
         <div class="textos">
-          <h4>Joguinho2</h4>
-          <h5>R$400</h5>
+          <h4>{{ jogo.name }}</h4>
+          <h5 style="color: #00e5ff;"> Previsto: {{ jogo.released ? (jogo.released | date:'MMM/yyyy') : 'Em breve' }}
+          </h5>
         </div>
-        <ion-icon name="heart-outline"></ion-icon>
-      </div>
-    </div>
-    <div>
-      <img src="../../assets/images/f42de69101cc58f6efae923254b34907.jpg" alt="">
-      <div class="info-jogo">
-        <div class="textos">
-          <h4>Joguinho2</h4>
-          <h5>R$400</h5>
+
+        <!-- Lado direito do card com Ícone + Badge -->
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 5px;">
+          <ion-icon name="heart-outline" style="font-size: 20px;"></ion-icon>
+          <ion-badge color="tertiary">{{ jogo.added | number }} 🔥</ion-badge>
         </div>
-        <ion-icon name="heart-outline"></ion-icon>
-      </div>
-    </div>
-    <div>
-      <img src="../../assets/images/f42de69101cc58f6efae923254b34907.jpg" alt="">
-      <div class="info-jogo">
-        <div class="textos">
-          <h4>Joguinho2</h4>
-          <h5>R$400</h5>
-        </div>
-        <ion-icon name="heart-outline"></ion-icon>
-      </div>
-    </div>
-    <div>
-      <img src="../../assets/images/f42de69101cc58f6efae923254b34907.jpg" alt="">
-      <div class="info-jogo">
-        <div class="textos">
-          <h4>Joguinho2</h4>
-          <h5>R$400</h5>
-        </div>
-        <ion-icon name="heart-outline"></ion-icon>
-      </div>
-    </div>
-    <div>
-      <img src="../../assets/images/f42de69101cc58f6efae923254b34907.jpg" alt="">
-      <div class="info-jogo">
-        <div class="textos">
-          <h4>Joguinho2</h4>
-          <h5>R$400</h5>
-        </div>
-        <ion-icon name="heart-outline"></ion-icon>
-      </div>
-    </div>
-    <div>
-      <img src="../../assets/images/f42de69101cc58f6efae923254b34907.jpg" alt="">
-      <div class="info-jogo">
-        <div class="textos">
-          <h4>Joguinho2</h4>
-          <h5>R$400</h5>
-        </div>
-        <ion-icon name="heart-outline"></ion-icon>
-      </div>
-    </div>
-    <div>
-      <img src="../../assets/images/f42de69101cc58f6efae923254b34907.jpg" alt="">
-      <div class="info-jogo">
-        <div class="textos">
-          <h4>Joguinho2</h4>
-          <h5>R$400</h5>
-        </div>
-        <ion-icon name="heart-outline"></ion-icon>
       </div>
     </div>
   </div>
 
-
-  <div class="tit-list">
-    <h3>Terror</h3> <a href="">Ver Mais</a>
-  </div>
+  <!-- SEÇÃO 1: EM ALTA (O HYPE REAL) -->
+  <h3 class="ion-padding-horizontal">🔥 Lançamentos</h3>
   <div class="listas">
-    <div>
-      <img src="../../assets/images/cb20ba0c4b4c6dbdea8724c9a40f3c77.jpg" alt="">
+    <div class="card-jogo" *ngFor="let jogo of listaEmAlta">
+      <img [src]="jogo.background_image" [alt]="jogo.name">
       <div class="info-jogo">
         <div class="textos">
-          <h4>Joguinho2</h4>
-          <h5>R$400</h5>
-        </div>
-        <ion-icon name="heart-outline"></ion-icon>
-      </div>
-    </div>
-    <div>
-      <img src="../../assets/images/cb20ba0c4b4c6dbdea8724c9a40f3c77.jpg" alt="">
-      <div class="info-jogo">
-        <div class="textos">
-          <h4>Joguinho2</h4>
-          <h5>R$400</h5>
-        </div>
-        <ion-icon name="heart-outline"></ion-icon>
-      </div>
-    </div>
-    <div>
-      <img src="../../assets/images/cb20ba0c4b4c6dbdea8724c9a40f3c77.jpg" alt="">
-      <div class="info-jogo">
-        <div class="textos">
-          <h4>Joguinho2</h4>
-          <h5>R$400</h5>
-        </div>
-        <ion-icon name="heart-outline"></ion-icon>
-      </div>
-    </div>
-    <div>
-      <img src="../../assets/images/cb20ba0c4b4c6dbdea8724c9a40f3c77.jpg" alt="">
-      <div class="info-jogo">
-        <div class="textos">
-          <h4>Joguinho2</h4>
-          <h5>R$400</h5>
-        </div>
-        <ion-icon name="heart-outline"></ion-icon>
-      </div>
-    </div>
-    <div>
-      <img src="../../assets/images/cb20ba0c4b4c6dbdea8724c9a40f3c77.jpg" alt="">
-      <div class="info-jogo">
-        <div class="textos">
-          <h4>Joguinho2</h4>
-          <h5>R$400</h5>
-        </div>
-        <ion-icon name="heart-outline"></ion-icon>
-      </div>
-    </div>
-    <div>
-      <img src="../../assets/images/cb20ba0c4b4c6dbdea8724c9a40f3c77.jpg" alt="">
-      <div class="info-jogo">
-        <div class="textos">
-          <h4>Joguinho2</h4>
-          <h5>R$400</h5>
-        </div>
-        <ion-icon name="heart-outline"></ion-icon>
-      </div>
-    </div>
-    <div>
-      <img src="../../assets/images/cb20ba0c4b4c6dbdea8724c9a40f3c77.jpg" alt="">
-      <div class="info-jogo">
-        <div class="textos">
-          <h4>Joguinho2</h4>
-          <h5>R$400</h5>
+          <h4>{{ jogo.name }}</h4>
+          <h5>Lançamento: {{ jogo.released | date:'yyyy' }}</h5>
         </div>
         <ion-icon name="heart-outline"></ion-icon>
       </div>
@@ -161,76 +53,46 @@
   </div>
 
 
-  <div class="tit-list">
-    <h3>Ação</h3> <a href="">Ver Mais</a>
-  </div>
+
+
+  <!-- SEÇÃO 2: AÇÃO (Substituindo o Terror que não existia na API) -->
+  <h3 class="ion-padding-horizontal">🎯 Aventuras boas essas</h3>
   <div class="listas">
-    <div>
-      <img src="../../assets/images/557bc8721aeb09e0d6ce1088206f462f.jpg" alt="">
+    <div class="card-jogo" *ngFor="let jogo of listaAcao"> <!-- MUDADO PARA listaAcao -->
+      <img [src]="jogo.background_image" [alt]="jogo.name">
       <div class="info-jogo">
         <div class="textos">
-          <h4>Joguinho2</h4>
-          <h5>R$400</h5>
+          <h4>{{ jogo.name }}</h4>
+          <h5>Nota: {{ jogo.metacritic || 'N/A' }}</h5>
         </div>
         <ion-icon name="heart-outline"></ion-icon>
       </div>
     </div>
-    <div>
-      <img src="../../assets/images/557bc8721aeb09e0d6ce1088206f462f.jpg" alt="">
+  </div>
+
+  <!-- SEÇÃO 3: RPG -->
+  <h3 class="ion-padding-horizontal">⚔️ Um Shooter, se preferir</h3>
+  <div class="listas">
+    <div class="card-jogo" *ngFor="let jogo of listaRPG">
+      <img [src]="jogo.background_image" [alt]="jogo.name">
       <div class="info-jogo">
         <div class="textos">
-          <h4>Joguinho2</h4>
-          <h5>R$400</h5>
+          <h4>{{ jogo.name }}</h4>
+          <h5>Nota: {{ jogo.metacritic || 'N/A' }}</h5>
         </div>
         <ion-icon name="heart-outline"></ion-icon>
       </div>
     </div>
-    <div>
-      <img src="../../assets/images/557bc8721aeb09e0d6ce1088206f462f.jpg" alt="">
+  </div>
+
+  <h3 class="ion-padding-horizontal">👨‍👩‍👧 Só os Indie</h3>
+  <div class="listas">
+    <div class="card-jogo" *ngFor="let jogo of listaFamily">
+      <img [src]="jogo.background_image" [alt]="jogo.name">
       <div class="info-jogo">
         <div class="textos">
-          <h4>Joguinho2</h4>
-          <h5>R$400</h5>
-        </div>
-        <ion-icon name="heart-outline"></ion-icon>
-      </div>
-    </div>
-    <div>
-      <img src="../../assets/images/557bc8721aeb09e0d6ce1088206f462f.jpg" alt="">
-      <div class="info-jogo">
-        <div class="textos">
-          <h4>Joguinho2</h4>
-          <h5>R$400</h5>
-        </div>
-        <ion-icon name="heart-outline"></ion-icon>
-      </div>
-    </div>
-    <div>
-      <img src="../../assets/images/557bc8721aeb09e0d6ce1088206f462f.jpg" alt="">
-      <div class="info-jogo">
-        <div class="textos">
-          <h4>Joguinho2</h4>
-          <h5>R$400</h5>
-        </div>
-        <ion-icon name="heart-outline"></ion-icon>
-      </div>
-    </div>
-    <div>
-      <img src="../../assets/images/557bc8721aeb09e0d6ce1088206f462f.jpg" alt="">
-      <div class="info-jogo">
-        <div class="textos">
-          <h4>Joguinho2</h4>
-          <h5>R$400</h5>
-        </div>
-        <ion-icon name="heart-outline"></ion-icon>
-      </div>
-    </div>
-    <div>
-      <img src="../../assets/images/557bc8721aeb09e0d6ce1088206f462f.jpg" alt="">
-      <div class="info-jogo">
-        <div class="textos">
-          <h4>Joguinho2</h4>
-          <h5>R$400</h5>
+          <h4>{{ jogo.name }}</h4>
+          <h5>Nota: {{ jogo.metacritic || 'N/A' }}</h5>
         </div>
         <ion-icon name="heart-outline"></ion-icon>
       </div>

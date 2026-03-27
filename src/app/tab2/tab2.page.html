@@ -1,9 +1,52 @@
 <ion-content [fullscreen]="true">
-
   <ion-item class="barra-pesquisa" lines="none">
-    <ion-input #campoBusca placeholder="Pesquisar"></ion-input>
-
+    <ion-input #campoBusca placeholder="Pesquisar (ex: Resident Evil)"
+      (keyup.enter)="pesquisarJogo(campoBusca.value)"></ion-input>
     <ion-icon name="search-outline" slot="end" (click)="pesquisarJogo(campoBusca.value)"></ion-icon>
   </ion-item>
 
+  <div *ngIf="carregando" class="ion-text-center ion-padding">
+    <ion-spinner name="crescent"></ion-spinner>
+  </div>
+
+  <div class="listas" *ngIf="resultados.length > 0 && !carregando">
+
+    <div class="card-pesquisa" *ngFor="let jogo of resultados">
+
+      <div class="thumb-wrapper">
+        <img [src]="jogo.thumb" [alt]="jogo.nome" />
+      </div>
+
+      <div class="info-jogo">
+        <div class="textos">
+          <h4 class="nome-jogo">{{ jogo.nome }}</h4>
+
+          <div class="precos">
+            <h5 class="preco-br" *ngIf="jogo.precoReal !== 'Carregando...' && jogo.precoReal !== 'N/A'">
+              <b class="valor-verde">{{ jogo.precoReal | currency:'BRL' }}</b>
+              <span class="nome-loja"> na {{ jogo.loja }}</span>
+            </h5>
+
+            <h5 class="carregando-precos" *ngIf="jogo.precoReal === 'Carregando...'">
+              <ion-spinner name="dots"></ion-spinner> Buscando oferta...
+            </h5>
+
+            <h5 class="nao-disponivel" *ngIf="jogo.precoReal === 'N/A'">
+              Preço não disponível p/ PC
+            </h5>
+          </div>
+
+          <ion-badge *ngIf="jogo.metacritic" color="dark">
+            Nota: {{ jogo.metacritic }}
+          </ion-badge>
+        </div>
+
+        <ion-button fill="clear" class="btn-favorito" (click)="toggleFavorito(jogo)">
+          <ion-icon [name]="jogo.favorito ? 'heart' : 'heart-outline'"
+            [color]="jogo.favorito ? 'danger' : 'white'"></ion-icon>
+        </ion-button>
+      </div>
+    </div>
+
+  </div>
 </ion-content>

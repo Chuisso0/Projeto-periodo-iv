@@ -5,6 +5,8 @@ import { IonicRouteStrategy, provideIonicAngular } from '@ionic/angular/standalo
 import { routes } from './app/app.routes';
 import { AppComponent } from './app/app.component';
 
+import { provideHttpClient } from '@angular/common/http';
+
 // Imports do Firebase (Mantenha estes que já estavam aí)
 import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
 import { getAuth, provideAuth } from '@angular/fire/auth';
@@ -15,6 +17,8 @@ bootstrapApplication(AppComponent, {
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     provideIonicAngular(),
     provideRouter(routes, withPreloading(PreloadAllModules)),
+
+    provideHttpClient(), // <-- Adicione esta linha para habilitar o HttpClient em todo o app
     // Configuração que o terminal gerou para você:
     provideFirebaseApp(() => initializeApp({
       projectId: "goldoffers-2514c",

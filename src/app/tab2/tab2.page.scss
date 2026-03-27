@@ -1,30 +1,151 @@
+// Fundo principal
 ion-content {
-    --background: black;
+    --background: #000000; // Preto Absoluto
 }
 
-ion-item {
-    --background: transparent;
-
-    color: white;
-    font-family: monospace;
+// BARRA DE PESQUISA (Já otimizada)
+.barra-pesquisa {
+    --background: #000000;
+    --color: white;
     width: 90%;
-    border-bottom: rgba(255, 255, 255, 0.17) 1px solid;
-    margin: 50px auto 0 auto;
+    margin: 20px auto;
+    border-radius: 12px;
+    border-bottom: 1px solid #6803c7; // Seu Roxo
+    --inner-padding-end: 10px;
+
+    ion-input {
+        // ADEUS MONOSPACE!
+        font-family: 'Inter', sans-serif; // Fonte mais moderna
+        color: white;
+        font-size: 1rem;
+        --placeholder-color: #888;
+    }
+
+    ion-icon {
+        color: #6803c7;
+        font-size: 1.4rem;
+    }
 }
 
-
-/* Estilizando o texto que o usuário vai digitar */
-.barra-pesquisa ion-input {
-    font-family: monospace;
-    color: white;
-    font-size: 1.1rem;
-    --highlight-color-focused: #6803c7;
-
+// O NOVO CONTAINER DE CARDS
+.listas {
+    display: flex;
+    flex-direction: column;
+    gap: 12px; // Espaço entre os cards
+    padding-bottom: 20px;
 }
 
-/* Estilizando a Lupa */
-.barra-pesquisa ion-icon {
-    color: white;
-    /* O seu roxo de destaque! */
-    font-size: 1.5rem;
+// O CARD DE PESQUISA (Inspirado no visual RAWG que você mandou)
+.card-pesquisa {
+    background: transparent;
+    width: 92%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column; // Imagem em cima, texto em baixo
+    border-radius: 12px;
+    overflow: hidden; // Garante bordas arredondadas na imagem
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+
+    // A Imagem HD
+    .thumb-wrapper {
+        width: 100%;
+        height: 140px; // Altura fixa igual à Home
+        background: #1a1a1a; // Cor de fundo se a imagem falhar
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; // Preenche sem distorcer
+        }
+    }
+
+    // Bloco de Informações (Flexbox Horizontal p/ texto e coração)
+    .info-jogo {
+        padding: 12px 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center; // Centraliza verticalmente o texto e o coração
+
+        .textos {
+            flex: 1; // Ocupa todo o espaço restante
+            padding-right: 15px;
+        }
+    }
+
+    // Nome do Jogo (Fonte Moderna)
+    .nome-jogo {
+        font-family: 'Inter', sans-serif; // Fonte limpa
+        color: white;
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis; // Se o nome for gigante, põe reticências
+    }
+
+    // O bloco de preço (Onde você queria)
+    .precos {
+        margin-top: 5px;
+
+        h5 {
+            margin: 0;
+            font-size: 0.85rem;
+            color: #bbb; // Cinza claro p/ o texto secundário
+        }
+
+        // O Valor Verde
+        .valor-verde {
+            color: #2dd36f; // Verde
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        .nome-loja {
+            font-weight: normal;
+        }
+
+        // Alerta de carregando
+        .carregando-precos {
+            display: flex;
+            align-items: center;
+            color: #888;
+
+            ion-spinner {
+                --color: #888;
+                width: 18px;
+                height: 18px;
+                margin-right: 5px;
+            }
+        }
+
+        .nao-disponivel {
+            color: #f04141; // Vermelho
+            font-size: 0.8rem;
+        }
+    }
+
+    // Badge (Opcional, se quiser)
+    ion-badge {
+        margin-top: 8px;
+        font-size: 0.7rem;
+        font-weight: bold;
+    }
+
+    // Botão de Favorito (Estilo RAWG)
+    .btn-favorito {
+        --padding-start: 0;
+        --padding-end: 0;
+        --margin-end: 0;
+        margin: 0;
+
+        ion-icon {
+            font-size: 24px; // Ícone maior
+        }
+    }
+}
+
+// Spinner Principal
+ion-spinner[name="crescent"] {
+    --color: #6803c7;
 }
