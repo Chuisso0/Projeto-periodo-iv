@@ -1,12 +1,18 @@
 <ion-content [fullscreen]="true">
 
+  <!-- BANNER DE DESTAQUE -->
   <div id="lancamento" *ngIf="jogoBanner">
     <img [src]="jogoBanner.background_image" [alt]="jogoBanner.name">
     <div class="info">
-      <!-- Div para alinhar o texto e o coração -->
       <div style="display: flex; justify-content: space-between; align-items: center;">
         <h5 style="color: #ffd900f8; font-weight: bold;">DESTAQUE RECENTE</h5>
-        <ion-icon name="heart-outline" style="font-size: 24px; color: white;"></ion-icon>
+
+        <!-- BOTÃO FAVORITO BANNER -->
+        <ion-button fill="clear" (click)="toggleFavorito(jogoBanner)">
+          <ion-icon slot="icon-only" [name]="jogoBanner.favorito ? 'heart' : 'heart-outline'"
+            [color]="jogoBanner.favorito ? 'danger' : 'light'" style="font-size: 28px;">
+          </ion-icon>
+        </ion-button>
       </div>
 
       <h3>{{ jogoBanner.name }}</h3>
@@ -17,6 +23,7 @@
     </div>
   </div>
 
+  <!-- SEÇÃO: MAIS AGUARDADOS -->
   <h3 class="ion-padding-horizontal">🚀 Mais Aguardados</h3>
   <div class="listas">
     <div class="card-jogo" *ngFor="let jogo of listaAguardados">
@@ -28,16 +35,21 @@
           </h5>
         </div>
 
-        <!-- Lado direito do card com Ícone + Badge -->
         <div style="display: flex; flex-direction: column; align-items: center; gap: 5px;">
-          <ion-icon name="heart-outline" style="font-size: 20px;"></ion-icon>
+          <!-- BOTÃO FAVORITO AGUARDADOS -->
+          <ion-button fill="clear" (click)="toggleFavorito(jogo)"
+            style="--padding-start: 0; --padding-end: 0; margin: 0;">
+            <ion-icon slot="icon-only" [name]="jogo.favorito ? 'heart' : 'heart-outline'"
+              [color]="jogo.favorito ? 'danger' : 'light'" style="font-size: 22px;">
+            </ion-icon>
+          </ion-button>
           <ion-badge color="tertiary">{{ jogo.added | number }} 🔥</ion-badge>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- SEÇÃO 1: EM ALTA (O HYPE REAL) -->
+  <!-- SEÇÃO: LANÇAMENTOS (EM ALTA) -->
   <h3 class="ion-padding-horizontal">🔥 Lançamentos</h3>
   <div class="listas">
     <div class="card-jogo" *ngFor="let jogo of listaEmAlta">
@@ -47,30 +59,35 @@
           <h4>{{ jogo.name }}</h4>
           <h5>Lançamento: {{ jogo.released | date:'yyyy' }}</h5>
         </div>
-        <ion-icon name="heart-outline"></ion-icon>
+        <!-- BOTÃO FAVORITO -->
+        <ion-button fill="clear" (click)="toggleFavorito(jogo)">
+          <ion-icon slot="icon-only" [name]="jogo.favorito ? 'heart' : 'heart-outline'"
+            [color]="jogo.favorito ? 'danger' : 'light'">
+          </ion-icon>
+        </ion-button>
       </div>
     </div>
   </div>
 
-
-
-
-  <!-- SEÇÃO 2: AÇÃO (Substituindo o Terror que não existia na API) -->
+  <!-- SEÇÃO: AÇÃO -->
   <h3 class="ion-padding-horizontal">🎯 Aventuras boas essas</h3>
   <div class="listas">
-    <div class="card-jogo" *ngFor="let jogo of listaAcao"> <!-- MUDADO PARA listaAcao -->
+    <div class="card-jogo" *ngFor="let jogo of listaAcao">
       <img [src]="jogo.background_image" [alt]="jogo.name">
       <div class="info-jogo">
         <div class="textos">
           <h4>{{ jogo.name }}</h4>
           <h5>Nota: {{ jogo.metacritic || 'N/A' }}</h5>
         </div>
-        <ion-icon name="heart-outline"></ion-icon>
+        <ion-button fill="clear" (click)="toggleFavorito(jogo)">
+          <ion-icon [name]="jogo.favorito ? 'heart' : 'heart-outline'"
+            [color]="jogo.favorito ? 'danger' : 'light'"></ion-icon>
+        </ion-button>
       </div>
     </div>
   </div>
 
-  <!-- SEÇÃO 3: RPG -->
+  <!-- SEÇÃO: RPG (SHOOTER) -->
   <h3 class="ion-padding-horizontal">⚔️ Um Shooter, se preferir</h3>
   <div class="listas">
     <div class="card-jogo" *ngFor="let jogo of listaRPG">
@@ -80,11 +97,15 @@
           <h4>{{ jogo.name }}</h4>
           <h5>Nota: {{ jogo.metacritic || 'N/A' }}</h5>
         </div>
-        <ion-icon name="heart-outline"></ion-icon>
+        <ion-button fill="clear" (click)="toggleFavorito(jogo)">
+          <ion-icon [name]="jogo.favorito ? 'heart' : 'heart-outline'"
+            [color]="jogo.favorito ? 'danger' : 'light'"></ion-icon>
+        </ion-button>
       </div>
     </div>
   </div>
 
+  <!-- SEÇÃO: INDIE -->
   <h3 class="ion-padding-horizontal">👨‍👩‍👧 Só os Indie</h3>
   <div class="listas">
     <div class="card-jogo" *ngFor="let jogo of listaFamily">
@@ -94,7 +115,10 @@
           <h4>{{ jogo.name }}</h4>
           <h5>Nota: {{ jogo.metacritic || 'N/A' }}</h5>
         </div>
-        <ion-icon name="heart-outline"></ion-icon>
+        <ion-button fill="clear" (click)="toggleFavorito(jogo)">
+          <ion-icon [name]="jogo.favorito ? 'heart' : 'heart-outline'"
+            [color]="jogo.favorito ? 'danger' : 'light'"></ion-icon>
+        </ion-button>
       </div>
     </div>
   </div>

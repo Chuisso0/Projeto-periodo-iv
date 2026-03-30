@@ -10,7 +10,6 @@
   </div>
 
   <div class="listas" *ngIf="resultados.length > 0 && !carregando">
-
     <div class="card-pesquisa" *ngFor="let jogo of resultados">
 
       <div class="thumb-wrapper">
@@ -22,21 +21,34 @@
           <h4 class="nome-jogo">{{ jogo.nome }}</h4>
 
           <div class="precos">
-            <h5 class="preco-br" *ngIf="jogo.precoReal !== 'Carregando...' && jogo.precoReal !== 'N/A'">
-              <b class="valor-verde">{{ jogo.precoReal | currency:'BRL' }}</b>
-              <span class="nome-loja"> na {{ jogo.loja }}</span>
-            </h5>
+            <div
+              *ngIf="jogo.precoReal !== 'Carregando...' && jogo.precoReal !== 'N/A' && jogo.precoReal !== 'Sem ofertas ativas' && jogo.precoReal !== 'Erro API' && jogo.precoReal !== 'Indisponível em R$'">
+              <h5 class="preco-br">
+                <b class="valor-verde">{{ jogo.precoReal }}</b>
+                <span class="nome-loja" *ngIf="jogo.loja"> na {{ jogo.loja }}</span>
+              </h5>
+
+              <ion-button *ngIf="jogo.linkLoja" [href]="jogo.linkLoja" target="_blank" fill="clear" size="small"
+                color="primary" class="ion-no-padding btn-ir-loja">
+                Ver na Loja <ion-icon name="open-outline" slot="end"></ion-icon>
+              </ion-button>
+            </div>
 
             <h5 class="carregando-precos" *ngIf="jogo.precoReal === 'Carregando...'">
               <ion-spinner name="dots"></ion-spinner> Buscando oferta...
             </h5>
 
-            <h5 class="nao-disponivel" *ngIf="jogo.precoReal === 'N/A'">
-              Preço não disponível p/ PC
+            <h5 class="nao-disponivel"
+              *ngIf="jogo.precoReal === 'N/A' || jogo.precoReal === 'Sem ofertas ativas' || jogo.precoReal === 'Indisponível em R$'">
+              Preço indisponível p/ PC (BRL)
+            </h5>
+
+            <h5 class="nao-disponivel" *ngIf="jogo.precoReal === 'Erro API'" style="color: var(--ion-color-warning);">
+              Falha ao conectar com ITAD
             </h5>
           </div>
 
-          <ion-badge *ngIf="jogo.metacritic" color="dark">
+          <ion-badge *ngIf="jogo.metacritic && jogo.metacritic > 0" color="dark">
             Nota: {{ jogo.metacritic }}
           </ion-badge>
         </div>
@@ -47,6 +59,5 @@
         </ion-button>
       </div>
     </div>
-
   </div>
 </ion-content>

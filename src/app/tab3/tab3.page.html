@@ -1,6 +1,64 @@
+<ion-header [translucent]="true" class="ion-no-border">
+  <ion-toolbar>
+    <ion-title>Minha Lista</ion-title>
+  </ion-toolbar>
+</ion-header>
+
 <ion-content [fullscreen]="true">
+  <div class="container">
 
-  <h1>Lista de Desejos</h1>
+    <!-- LISTA DE FAVORITOS -->
+    <div *ngIf="(meusFavoritos$ | async) as favoritos">
 
+      <!-- ESTADO VAZIO -->
+      <div *ngIf="favoritos.length === 0" class="empty-state">
+        <ion-icon name="heart-dislike-outline"></ion-icon>
+        <h2>Sua lista está vazia</h2>
+        <p>Favorite jogos na busca ou na home para acompanhá-los aqui.</p>
+        <ion-button routerLink="/tabs/tab2" fill="outline" color="tertiary">
+          Procurar Jogos
+        </ion-button>
+      </div>
 
+      <!-- GRID DE CARDS -->
+      <div class="grid-favoritos">
+        <div class="card-favorito" *ngFor="let jogo of favoritos">
+          <div class="banner-wrapper">
+            <img [src]="jogo.thumb" [alt]="jogo.nome">
+            <div class="gradient-overlay"></div>
+
+            <ion-button class="btn-remove" fill="clear" (click)="remover(jogo.id)">
+              <ion-icon name="heart" color="danger"></ion-icon>
+            </ion-button>
+
+            <div class="nota-badge" *ngIf="jogo.metacritic">
+              {{ jogo.metacritic }}
+            </div>
+          </div>
+
+          <div class="card-footer">
+            <h4 class="nome-jogo">{{ jogo.nome }}</h4>
+
+            <div class="status-preco">
+              <!-- Exibe o preço ou o status de carregamento -->
+              <span class="status">{{ jogo.precoReal || 'Monitorando preço...' }}</span>
+
+              <!-- Mostra a loja se ela existir -->
+              <small *ngIf="jogo.loja" style="display: block; opacity: 0.7; font-size: 0.8em; margin-bottom: 5px;">
+                via {{ jogo.loja }}
+              </small>
+
+              <!-- BOTÃO DE LINK ADICIONADO AQUI -->
+              <ion-button *ngIf="jogo.linkLoja" [href]="jogo.linkLoja" target="_blank" fill="clear" size="small"
+                color="primary" class="ion-no-padding btn-loja-favorito">
+                Ver na Loja
+                <ion-icon name="open-outline" slot="end"></ion-icon>
+              </ion-button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
 </ion-content>

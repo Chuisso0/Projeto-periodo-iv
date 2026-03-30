@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, of, catchError } from 'rxjs';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { Observable, of, catchError, timeout } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class ItadService {
@@ -18,10 +18,19 @@ export class ItadService {
 
   // 2. Busca o preço pelo ID (V3 - Preço do Brasil)
   getPrecoV3(gameId: string): Observable<any> {
-    // Adicionamos a lista de lojas de PC que operam no BR (Nuuvem=33, Steam=61, Epic=103...)
-    // Mas o mais seguro é deixar o country=BR agir, ele já filtra naturalmente para PC
-    return this.http.post(`${this.baseUrl}/games/prices/v3?key=${this.apiKey}&country=BR`, [gameId]).pipe(
-      catchError(() => of(null))
+    if (!gameId) return of(null);
+
+    // Removi os headers manuais. 
+    // No PC, o navegador briga com o 'Content-Type' customizado em chamadas POST simples.
+    return this.http.post(
+      `${this.baseUrl}/games/prices/v3?key=${this.apiKey}&country=BR&nondeals=true`,
+      [gameId] // Passa o array direto, o Angular se vira
+    ).pipe(
+      timeout(5000),
+      catchError((err) => {
+        console.error('Erro na ITAD:', err);
+        return of(null);
+      })
     );
   }
 }

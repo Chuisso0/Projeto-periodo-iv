@@ -1,11 +1,136 @@
+// Fundo principal escuro
 ion-content {
-    --background: #000;
-
+    --background: #0f0f12; // Tom de preto azulado
 }
 
+ion-toolbar {
+    --background: #0f0f12;
+    --color: white;
+    --border-style: none;
+    font-weight: bold;
+}
 
-h1 {
+.container {
+    padding: 16px;
+}
+
+.btn-loja-favorito {
+    height: 25px;
+    font-size: 0.75rem;
+    margin-top: 4px;
+    --padding-start: 0;
+    text-transform: none; // Evita que o texto fique todo em maiúsculo
+}
+
+.status-preco {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; // Alinha preço, loja e botão à esquerda
+}
+
+// Grid de 2 colunas para os favoritos
+.grid-favoritos {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+}
+
+.card-favorito {
+    background: #1c1c24;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    transition: transform 0.2s;
+
+    &:active {
+        transform: scale(0.95);
+    }
+}
+
+.banner-wrapper {
+    position: relative;
+    height: 120px;
+
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .gradient-overlay {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 60%;
+        background: linear-gradient(to top, #1c1c24, transparent);
+    }
+}
+
+.btn-remove {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    --padding-start: 5px;
+    --padding-end: 5px;
+    z-index: 10;
+}
+
+.nota-badge {
+    position: absolute;
+    bottom: 8px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 2px 8px;
+    border-radius: 6px;
+    color: #00ff88; // Verde neon para a nota
+    font-size: 12px;
+    font-weight: bold;
+    border: 1px solid #00ff88;
+}
+
+.card-footer {
+    padding: 10px;
+
+    .nome-jogo {
+        margin: 0;
+        color: white;
+        font-size: 14px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .status {
+        font-size: 11px;
+        color: #a0a0b0;
+        font-weight: 300;
+    }
+}
+
+// Estilo para quando não tem nada
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 100px;
     text-align: center;
-    font-family: monospace;
 
+    ion-icon {
+        font-size: 80px;
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    h2 {
+        color: white;
+        font-weight: bold;
+    }
+
+    p {
+        color: #888;
+        max-width: 250px;
+        margin-bottom: 30px;
+    }
 }
