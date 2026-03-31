@@ -5,6 +5,7 @@ ion-content {
 
 // BARRA DE PESQUISA (Já otimizada)
 .barra-pesquisa {
+    padding-top: 6vh;
     --background: #000000;
     --color: white;
     width: 90%;
@@ -27,6 +28,27 @@ ion-content {
     }
 }
 
+.preco-br {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 5px;
+}
+
+.preco-riscado {
+    text-decoration: line-through; // Isso faz o risco no meio
+    color: #888;
+    font-size: 0.85em;
+    font-weight: normal;
+    opacity: 0.8;
+}
+
+.valor-verde {
+    color: #2dd36f; // Verde do Ionic
+    font-size: 1.1em;
+}
+
 // O NOVO CONTAINER DE CARDS
 .listas {
     display: flex;
@@ -41,106 +63,95 @@ ion-content {
     width: 92%;
     margin: 0 auto;
     display: flex;
-    flex-direction: column; // Imagem em cima, texto em baixo
+    flex-direction: column;
     border-radius: 12px;
-    overflow: hidden; // Garante bordas arredondadas na imagem
+    overflow: hidden;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
 
-    // A Imagem HD
     .thumb-wrapper {
         width: 100%;
-        height: 140px; // Altura fixa igual à Home
-        background: #1a1a1a; // Cor de fundo se a imagem falhar
+        height: 140px;
+        background: #1a1a1a;
 
         img {
             width: 100%;
             height: 100%;
-            object-fit: cover; // Preenche sem distorcer
+            object-fit: cover;
         }
     }
 
-    // Bloco de Informações (Flexbox Horizontal p/ texto e coração)
+    // BLOCO DE INFORMAÇÕES AJUSTADO
     .info-jogo {
         padding: 12px 15px;
         display: flex;
         justify-content: space-between;
-        align-items: center; // Centraliza verticalmente o texto e o coração
+        align-items: center;
+        width: 100%; // Garante que use a largura total
+        min-width: 0; // Importante para o flexbox
 
         .textos {
-            flex: 1; // Ocupa todo o espaço restante
+            flex: 1;
             padding-right: 15px;
+            min-width: 0; // O SEGREDO ESTÁ AQUI: permite que o texto respeite o limite e use reticências
+            display: flex;
+            flex-direction: column;
         }
     }
 
-    // Nome do Jogo (Fonte Moderna)
     .nome-jogo {
-        font-family: 'Inter', sans-serif; // Fonte limpa
+        font-family: 'Inter', sans-serif;
         color: white;
-        font-size: 1.2rem;
+        font-size: 1.1rem; // Diminuído levemente para caber melhor
         font-weight: 700;
         margin: 0;
         white-space: nowrap;
         overflow: hidden;
-        text-overflow: ellipsis; // Se o nome for gigante, põe reticências
+        text-overflow: ellipsis; // Adiciona os "..."
+        width: 100%; // Força a ocupar apenas o espaço do pai (.textos)
     }
 
-    // O bloco de preço (Onde você queria)
     .precos {
         margin-top: 5px;
+
+        // Ajuste para o preço riscado não quebrar o layout
+        .preco-br {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0;
+        }
 
         h5 {
             margin: 0;
             font-size: 0.85rem;
-            color: #bbb; // Cinza claro p/ o texto secundário
+            color: #bbb;
         }
 
-        // O Valor Verde
         .valor-verde {
-            color: #2dd36f; // Verde
+            color: #2dd36f;
             font-size: 1.1rem;
             font-weight: bold;
         }
 
-        .nome-loja {
-            font-weight: normal;
-        }
-
-        // Alerta de carregando
-        .carregando-precos {
-            display: flex;
-            align-items: center;
+        .preco-riscado {
+            text-decoration: line-through;
             color: #888;
-
-            ion-spinner {
-                --color: #888;
-                width: 18px;
-                height: 18px;
-                margin-right: 5px;
-            }
-        }
-
-        .nao-disponivel {
-            color: #f04141; // Vermelho
             font-size: 0.8rem;
+            opacity: 0.7;
         }
     }
 
-    // Badge (Opcional, se quiser)
-    ion-badge {
-        margin-top: 8px;
-        font-size: 0.7rem;
-        font-weight: bold;
-    }
-
-    // Botão de Favorito (Estilo RAWG)
+    // BOTÃO DE FAVORITO TRAVADO
     .btn-favorito {
+        flex-shrink: 0; // IMPEDE que o nome do jogo empurre o botão para fora
         --padding-start: 0;
         --padding-end: 0;
         --margin-end: 0;
         margin: 0;
+        z-index: 10;
 
         ion-icon {
-            font-size: 24px; // Ícone maior
+            font-size: 26px;
         }
     }
 }

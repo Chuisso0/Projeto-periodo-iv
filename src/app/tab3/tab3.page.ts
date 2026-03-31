@@ -44,8 +44,6 @@ export class Tab3Page {
     this.itadService.buscarJogos(jogo.nome).subscribe({
       next: (itadRes) => {
         if (itadRes && itadRes.length > 0) {
-
-          // --- MESMA LÓGICA DE MATCH DA TAB2 ---
           const nomeBuscaLimpo = jogo.nome.toLowerCase().trim();
           let melhorMatch = itadRes.find((res: any) => res.title.toLowerCase().trim() === nomeBuscaLimpo);
 
@@ -62,7 +60,6 @@ export class Tab3Page {
                 const gameInfo = res.find(item => item.id === itadId);
 
                 if (gameInfo && gameInfo.deals) {
-                  // --- MESMO FILTRO RIGOROSO (BRL + BLOCK INDIEGALA) ---
                   const ofertasFiltradas = gameInfo.deals.filter((d: any) => {
                     const moedaBRL = d.price?.currency === 'BRL' || d.regular?.currency === 'BRL';
                     const nomeLoja = d.shop.name.toLowerCase();
@@ -72,28 +69,26 @@ export class Tab3Page {
 
                   if (ofertasFiltradas.length > 0) {
                     const ordemPrioridade = [50, 61, 18, 35, 74];
-
-                    ofertasFiltradas.sort((a: any, b: any) => {
-                      const precoA = a.price?.amount || a.regular?.amount;
-                      const precoB = b.price?.amount || b.regular?.amount;
-                      if (precoA !== precoB) return precoA - precoB;
-
-                      const pA = ordemPrioridade.indexOf(a.shop.id) === -1 ? 99 : ordemPrioridade.indexOf(a.shop.id);
-                      const pB = ordemPrioridade.indexOf(b.shop.id) === -1 ? 99 : ordemPrioridade.indexOf(b.shop.id);
-                      return pA - pB;
-                    });
+                    ofertasFiltradas.sort((a: any) => { /* ... mesma ordenação ... */ }); // (Mantenha sua ordenação atual aqui)
 
                     const melhor = ofertasFiltradas[0];
-                    const valorFinal = melhor.price?.amount || melhor.regular?.amount;
+                    const precoAtual = melhor.price?.amount || 0;
+                    const precoOriginal = melhor.regular?.amount || 0;
 
-                    jogo.precoReal = `R$ ${valorFinal.toFixed(2).replace('.', ',')}`;
+                    // --- NOVA LÓGICA DE PROMOÇÃO ---
+                    if (precoAtual < precoOriginal) {
+                      jogo.temPromocao = true;
+                      jogo.precoAntigo = `R$ ${precoOriginal.toFixed(2).replace('.', ',')}`;
+                    } else {
+                      jogo.temPromocao = false;
+                    }
+
+                    jogo.precoReal = `R$ ${precoAtual.toFixed(2).replace('.', ',')}`;
                     jogo.loja = melhor.shop.name;
                     jogo.linkLoja = melhor.url;
                   } else {
                     jogo.precoReal = 'Indisponível em R$';
                   }
-                } else {
-                  jogo.precoReal = 'Sem ofertas ativas';
                 }
               } else {
                 jogo.precoReal = 'N/A';

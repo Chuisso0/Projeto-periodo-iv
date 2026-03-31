@@ -6,6 +6,7 @@ import { searchOutline, heartOutline, heart, openOutline } from 'ionicons/icons'
 import { GameService } from '../services/game-service';
 import { ItadService } from '../services/itad';
 import { FavoritesService } from '../services/favorites.service';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-tab2',
@@ -27,6 +28,25 @@ export class Tab2Page {
     addIcons({ searchOutline, heartOutline, heart, openOutline });
   }
 
+  // Sincroniza os ícones de coração sempre que a página ganhar foco
+  async ionViewWillEnter() {
+    if (this.resultados.length > 0) {
+      await this.sincronizarFavoritos();
+    }
+  }
+
+  // Função para checar quais jogos dos resultados já estão nos favoritos
+  async sincronizarFavoritos() {
+    const favoritos = await firstValueFrom(this.favService.getFavorites());
+    if (favoritos) {
+      const idsFavoritos = favoritos.map(f => f.id);
+      this.resultados.forEach(jogo => {
+        jogo.favorito = idsFavoritos.includes(jogo.id);
+      });
+      this.cdr.detectChanges();
+    }
+  }
+
   pesquisarJogo(termo: any) {
     if (!termo || termo.trim() === '') {
       this.resultados = [];
@@ -37,15 +57,16 @@ export class Tab2Page {
     this.resultados = [];
 
     this.gameService.buscarJogos(termo).subscribe({
-      next: (res) => {
+      next: async (res) => {
         const idsVistos = new Set();
         const termoBusca = termo.toLowerCase().trim();
 
-        this.resultados = res.results
+        // 1. Mapeamento inicial dos dados da RAWG
+        const jogosMapeados = res.results
           .filter((j: any) => {
             const nomeJogo = j.name.toLowerCase();
             const ehPC = j.platforms?.some((p: any) => p.platform.id === 4);
-            const blacklist = ['survivor', 'soundtrack', 'bundle', 'dlc', 'trailer'];
+            const blacklist = ['survivor', 'soundtrack', 'bundle', 'dlc', 'trailer', '(18+)', 'Mugen', 'trainer', '[+18]', '[18+]', 'demo', 'early access', 'beta', 'vr', 'vr-only', 'vr supported'];
             const estaNaBlacklist = blacklist.some(ruim => nomeJogo.includes(ruim));
             const ehRelevante = j.added >= 5;
             const jaViEsseID = idsVistos.has(j.id);
@@ -64,8 +85,15 @@ export class Tab2Page {
             precoReal: 'Carregando...',
             loja: '',
             linkLoja: '',
-            favorito: false
+            favorito: false, // Será atualizado na sincronização abaixo
+            temPromocao: false,
+            precoAntigo: null
           }));
+
+        this.resultados = jogosMapeados;
+
+        // Sincroniza corações imediatamente após carregar a lista
+        await this.sincronizarFavoritos();
 
         if (this.resultados.length === 0) {
           this.carregando = false;
@@ -73,22 +101,16 @@ export class Tab2Page {
           return;
         }
 
+        // 2. Busca de preços na ITAD para cada jogo filtrado
         this.resultados.forEach(jogo => {
           this.itadService.buscarJogos(jogo.nome).subscribe(itadRes => {
             if (itadRes && itadRes.length > 0) {
-
-              // --- LÓGICA PARA EVITAR JOGO ERRADO (Ex: RE6 vs Village) ---
               const nomeBuscaLimpo = jogo.nome.toLowerCase().trim();
-
-              // Tenta achar o nome exato primeiro
               let melhorMatch = itadRes.find((res: any) => res.title.toLowerCase().trim() === nomeBuscaLimpo);
-
-              // Se não achou exato, tenta um que contenha o nome (mas que não seja o Village se buscamos o 6)
               if (!melhorMatch) {
                 melhorMatch = itadRes.find((res: any) => res.title.toLowerCase().includes(nomeBuscaLimpo));
               }
 
-              // Usa o ID do match encontrado ou o primeiro da lista como último recurso
               const itadId = melhorMatch ? melhorMatch.id : itadRes[0].id;
               jogo.itadId = itadId;
 
@@ -98,8 +120,6 @@ export class Tab2Page {
                     const gameInfo = res.find(item => item.id === itadId);
 
                     if (gameInfo && gameInfo.deals && gameInfo.deals.length > 0) {
-
-                      // --- FILTRO ULTRA RIGOROSO (BRL + BLOCK INDIEGALA) ---
                       const ofertasFiltradas = gameInfo.deals.filter((d: any) => {
                         const moedaBRL = d.price?.currency === 'BRL' || d.regular?.currency === 'BRL';
                         const nomeLoja = d.shop.name.toLowerCase();
@@ -109,21 +129,28 @@ export class Tab2Page {
 
                       if (ofertasFiltradas.length > 0) {
                         const ordemPrioridade = [50, 61, 18, 35, 74];
-
                         ofertasFiltradas.sort((a: any, b: any) => {
                           const precoA = a.price?.amount || a.regular?.amount;
                           const precoB = b.price?.amount || b.regular?.amount;
                           if (precoA !== precoB) return precoA - precoB;
-
                           const pA = ordemPrioridade.indexOf(a.shop.id) === -1 ? 99 : ordemPrioridade.indexOf(a.shop.id);
                           const pB = ordemPrioridade.indexOf(b.shop.id) === -1 ? 99 : ordemPrioridade.indexOf(b.shop.id);
                           return pA - pB;
                         });
 
                         const melhor = ofertasFiltradas[0];
-                        const valorFinal = melhor.price?.amount || melhor.regular?.amount;
+                        const precoAtual = melhor.price?.amount || 0;
+                        const precoOriginal = melhor.regular?.amount || 0;
 
-                        jogo.precoReal = `R$ ${valorFinal.toFixed(2).replace('.', ',')}`;
+                        if (precoAtual < precoOriginal) {
+                          jogo.temPromocao = true;
+                          jogo.precoAntigo = `R$ ${precoOriginal.toFixed(2).replace('.', ',')}`;
+                        } else {
+                          jogo.temPromocao = false;
+                          jogo.precoAntigo = null;
+                        }
+
+                        jogo.precoReal = `R$ ${precoAtual.toFixed(2).replace('.', ',')}`;
                         jogo.loja = melhor.shop.name;
                         jogo.linkLoja = melhor.url;
                       } else {
@@ -157,6 +184,7 @@ export class Tab2Page {
   }
 
   async toggleFavorito(jogo: any) {
+    // Muda visualmente primeiro para resposta imediata
     jogo.favorito = !jogo.favorito;
     try {
       if (jogo.favorito) {
@@ -166,6 +194,7 @@ export class Tab2Page {
       }
     } catch (error) {
       console.error('Erro ao favoritar:', error);
+      // Reverte se der erro
       jogo.favorito = !jogo.favorito;
     }
   }

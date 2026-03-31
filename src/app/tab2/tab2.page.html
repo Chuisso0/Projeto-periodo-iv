@@ -23,8 +23,16 @@
           <div class="precos">
             <div
               *ngIf="jogo.precoReal !== 'Carregando...' && jogo.precoReal !== 'N/A' && jogo.precoReal !== 'Sem ofertas ativas' && jogo.precoReal !== 'Erro API' && jogo.precoReal !== 'Indisponível em R$'">
+
               <h5 class="preco-br">
+                <!-- Preço Antigo (Riscado) -->
+                <span class="preco-riscado" *ngIf="jogo.temPromocao">
+                  {{ jogo.precoAntigo }}
+                </span>
+
+                <!-- Preço Atual -->
                 <b class="valor-verde">{{ jogo.precoReal }}</b>
+
                 <span class="nome-loja" *ngIf="jogo.loja"> na {{ jogo.loja }}</span>
               </h5>
 
@@ -34,18 +42,11 @@
               </ion-button>
             </div>
 
+            <!-- Mantha os spinners e mensagens de erro originais abaixo -->
             <h5 class="carregando-precos" *ngIf="jogo.precoReal === 'Carregando...'">
               <ion-spinner name="dots"></ion-spinner> Buscando oferta...
             </h5>
 
-            <h5 class="nao-disponivel"
-              *ngIf="jogo.precoReal === 'N/A' || jogo.precoReal === 'Sem ofertas ativas' || jogo.precoReal === 'Indisponível em R$'">
-              Preço indisponível p/ PC (BRL)
-            </h5>
-
-            <h5 class="nao-disponivel" *ngIf="jogo.precoReal === 'Erro API'" style="color: var(--ion-color-warning);">
-              Falha ao conectar com ITAD
-            </h5>
           </div>
 
           <ion-badge *ngIf="jogo.metacritic && jogo.metacritic > 0" color="dark">

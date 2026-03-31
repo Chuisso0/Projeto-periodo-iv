@@ -40,15 +40,25 @@
             <h4 class="nome-jogo">{{ jogo.nome }}</h4>
 
             <div class="status-preco">
-              <!-- Exibe o preço ou o status de carregamento -->
-              <span class="status">{{ jogo.precoReal || 'Monitorando preço...' }}</span>
+              <!-- Exibe o preço -->
+              <div class="preco-favorito-container">
+                <!-- Preço Antigo (Só aparece se for promoção) -->
+                <span class="preco-riscado" *ngIf="jogo.temPromocao">
+                  {{ jogo.precoAntigo }}
+                </span>
 
-              <!-- Mostra a loja se ela existir -->
+                <!-- Preço Atual -->
+                <span class="status" [class.valor-verde]="jogo.precoReal?.includes('R$')">
+                  {{ jogo.precoReal || 'Monitorando preço...' }}
+                </span>
+              </div>
+
+              <!-- Mostra a loja -->
               <small *ngIf="jogo.loja" style="display: block; opacity: 0.7; font-size: 0.8em; margin-bottom: 5px;">
                 via {{ jogo.loja }}
               </small>
 
-              <!-- BOTÃO DE LINK ADICIONADO AQUI -->
+              <!-- BOTÃO DE LINK -->
               <ion-button *ngIf="jogo.linkLoja" [href]="jogo.linkLoja" target="_blank" fill="clear" size="small"
                 color="primary" class="ion-no-padding btn-loja-favorito">
                 Ver na Loja
