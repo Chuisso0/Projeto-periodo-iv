@@ -37,13 +37,17 @@ export class Tab2Page {
 
   // Função para checar quais jogos dos resultados já estão nos favoritos
   async sincronizarFavoritos() {
-    const favoritos = await firstValueFrom(this.favService.getFavorites());
-    if (favoritos) {
-      const idsFavoritos = favoritos.map(f => f.id);
-      this.resultados.forEach(jogo => {
-        jogo.favorito = idsFavoritos.includes(jogo.id);
-      });
-      this.cdr.detectChanges();
+    try {
+      const favoritos = await firstValueFrom(this.favService.getFavorites());
+      if (favoritos) {
+        const idsFavoritos = favoritos.map(f => f.id);
+        this.resultados.forEach(jogo => {
+          jogo.favorito = idsFavoritos.includes(jogo.id);
+        });
+        this.cdr.detectChanges();
+      }
+    } catch (error) {
+      console.error('Erro ao sincronizar favoritos:', error);
     }
   }
 
@@ -85,7 +89,7 @@ export class Tab2Page {
             precoReal: 'Carregando...',
             loja: '',
             linkLoja: '',
-            favorito: false, // Será atualizado na sincronização abaixo
+            favorito: false,
             temPromocao: false,
             precoAntigo: null
           }));
@@ -106,6 +110,8 @@ export class Tab2Page {
           this.itadService.buscarJogos(jogo.nome).subscribe(itadRes => {
             if (itadRes && itadRes.length > 0) {
               const nomeBuscaLimpo = jogo.nome.toLowerCase().trim();
+
+              // Busca o melhor match de nome
               let melhorMatch = itadRes.find((res: any) => res.title.toLowerCase().trim() === nomeBuscaLimpo);
               if (!melhorMatch) {
                 melhorMatch = itadRes.find((res: any) => res.title.toLowerCase().includes(nomeBuscaLimpo));
@@ -114,10 +120,12 @@ export class Tab2Page {
               const itadId = melhorMatch ? melhorMatch.id : itadRes[0].id;
               jogo.itadId = itadId;
 
-              this.itadService.getPrecoV3(itadId).subscribe({
+              // Passamos o ID garantindo que é uma string
+              this.itadService.getPrecoV3(String(itadId)).subscribe({
                 next: (res: any[]) => {
                   if (res && res.length > 0) {
-                    const gameInfo = res.find(item => item.id === itadId);
+                    // Usamos '==' para evitar problemas de tipo String vs Number no ID
+                    const gameInfo = res.find(item => item.id == itadId);
 
                     if (gameInfo && gameInfo.deals && gameInfo.deals.length > 0) {
                       const ofertasFiltradas = gameInfo.deals.filter((d: any) => {
@@ -164,6 +172,10 @@ export class Tab2Page {
                     jogo.precoReal = 'N/A';
                   }
                   this.cdr.detectChanges();
+                },
+                error: () => {
+                  jogo.precoReal = 'Erro ao buscar preço';
+                  this.cdr.detectChanges();
                 }
               });
             } else {
@@ -184,7 +196,6 @@ export class Tab2Page {
   }
 
   async toggleFavorito(jogo: any) {
-    // Muda visualmente primeiro para resposta imediata
     jogo.favorito = !jogo.favorito;
     try {
       if (jogo.favorito) {
@@ -194,7 +205,6 @@ export class Tab2Page {
       }
     } catch (error) {
       console.error('Erro ao favoritar:', error);
-      // Reverte se der erro
       jogo.favorito = !jogo.favorito;
     }
   }

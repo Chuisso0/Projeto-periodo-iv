@@ -1,19 +1,19 @@
-import { Component, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, ChangeDetectorRef, inject } from '@angular/core';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonThumbnail, IonLabel, IonButton, IonIcon, IonBadge, IonSpinner } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonThumbnail, IonLabel, IonButton, IonIcon } from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import { openOutline, heart, heartDislikeOutline } from 'ionicons/icons';
 import { FavoritesService } from '../services/favorites.service';
 import { ItadService } from '../services/itad';
-import { Observable } from 'rxjs';
+import { Observable, firstValueFrom } from 'rxjs';
 import { tap } from 'rxjs/operators';
-import { addIcons } from 'ionicons';
-import { openOutline, trashOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-tab3',
   templateUrl: 'tab3.page.html',
   styleUrls: ['tab3.page.scss'],
   standalone: true,
-  imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonThumbnail, IonLabel, IonButton, IonIcon, CommonModule]
+  imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonThumbnail, IonLabel, IonButton, IonIcon, IonBadge, IonSpinner, CommonModule]
 })
 export class Tab3Page {
   private favService = inject(FavoritesService);
@@ -23,7 +23,7 @@ export class Tab3Page {
   meusFavoritos$: Observable<any[]>;
 
   constructor() {
-    addIcons({ openOutline, trashOutline });
+    addIcons({ openOutline, heart, heartDislikeOutline });
 
     this.meusFavoritos$ = this.favService.getFavorites().pipe(
       tap(jogos => {
@@ -35,6 +35,7 @@ export class Tab3Page {
   }
 
   private buscarPrecoSeNecessario(jogo: any) {
+    // Se já estiver carregando ou já tiver o preço final, não busca de novo
     if (jogo.precoReal &&
       jogo.precoReal !== 'Buscando...' &&
       jogo.precoReal !== 'Monitorando preço...') return;
@@ -54,12 +55,14 @@ export class Tab3Page {
           const itadId = melhorMatch ? melhorMatch.id : itadRes[0].id;
           jogo.itadId = itadId;
 
-          this.itadService.getPrecoV3(itadId).subscribe({
+          // Chamada de preço com tratamento para Mobile
+          this.itadService.getPrecoV3(String(itadId)).subscribe({
             next: (res: any[]) => {
               if (res && res.length > 0) {
-                const gameInfo = res.find(item => item.id === itadId);
+                // '==' para evitar erro de tipo String vs Number
+                const gameInfo = res.find(item => item.id == itadId);
 
-                if (gameInfo && gameInfo.deals) {
+                if (gameInfo && gameInfo.deals && gameInfo.deals.length > 0) {
                   const ofertasFiltradas = gameInfo.deals.filter((d: any) => {
                     const moedaBRL = d.price?.currency === 'BRL' || d.regular?.currency === 'BRL';
                     const nomeLoja = d.shop.name.toLowerCase();
@@ -69,18 +72,25 @@ export class Tab3Page {
 
                   if (ofertasFiltradas.length > 0) {
                     const ordemPrioridade = [50, 61, 18, 35, 74];
-                    ofertasFiltradas.sort((a: any) => { /* ... mesma ordenação ... */ }); // (Mantenha sua ordenação atual aqui)
+                    ofertasFiltradas.sort((a: any, b: any) => {
+                      const precoA = a.price?.amount || a.regular?.amount;
+                      const precoB = b.price?.amount || b.regular?.amount;
+                      if (precoA !== precoB) return precoA - precoB;
+                      const pA = ordemPrioridade.indexOf(a.shop.id) === -1 ? 99 : ordemPrioridade.indexOf(a.shop.id);
+                      const pB = ordemPrioridade.indexOf(b.shop.id) === -1 ? 99 : ordemPrioridade.indexOf(b.shop.id);
+                      return pA - pB;
+                    });
 
                     const melhor = ofertasFiltradas[0];
                     const precoAtual = melhor.price?.amount || 0;
                     const precoOriginal = melhor.regular?.amount || 0;
 
-                    // --- NOVA LÓGICA DE PROMOÇÃO ---
                     if (precoAtual < precoOriginal) {
                       jogo.temPromocao = true;
                       jogo.precoAntigo = `R$ ${precoOriginal.toFixed(2).replace('.', ',')}`;
                     } else {
                       jogo.temPromocao = false;
+                      jogo.precoAntigo = null;
                     }
 
                     jogo.precoReal = `R$ ${precoAtual.toFixed(2).replace('.', ',')}`;
@@ -89,6 +99,8 @@ export class Tab3Page {
                   } else {
                     jogo.precoReal = 'Indisponível em R$';
                   }
+                } else {
+                  jogo.precoReal = 'Sem ofertas ativas';
                 }
               } else {
                 jogo.precoReal = 'N/A';
@@ -104,11 +116,20 @@ export class Tab3Page {
           jogo.precoReal = 'N/A';
           this.cdr.detectChanges();
         }
+      },
+      error: () => {
+        jogo.precoReal = 'N/A';
+        this.cdr.detectChanges();
       }
     });
   }
 
-  remover(jogoId: any) {
-    this.favService.removeFavorite(jogoId);
+  async remover(jogoId: any) {
+    try {
+      await this.favService.removeFavorite(jogoId);
+      // O Observable meusFavoritos$ atualizará a lista automaticamente
+    } catch (error) {
+      console.error('Erro ao remover favorito:', error);
+    }
   }
 }

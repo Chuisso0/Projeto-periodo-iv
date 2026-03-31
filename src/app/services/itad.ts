@@ -1,35 +1,40 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Observable, of, catchError, timeout } from 'rxjs';
+import { CapacitorHttp, HttpResponse } from '@capacitor/core'; // Importação do Core original
+import { from, Observable, of } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
 
 @Injectable({ providedIn: 'root' })
 export class ItadService {
   private apiKey = '0b344330a6045942899e19bc73202934c81e397b';
   private baseUrl = 'https://api.isthereanydeal.com';
 
-  constructor(private http: HttpClient) { }
+  constructor() { }
 
-  // 1. Busca a lista de jogos pelo nome (Endpoint estável)
   buscarJogos(nome: string): Observable<any> {
-    return this.http.get(`${this.baseUrl}/games/search/v1?key=${this.apiKey}&title=${nome}`).pipe(
+    const options = {
+      url: `${this.baseUrl}/games/search/v1?key=${this.apiKey}&title=${encodeURIComponent(nome)}`,
+    };
+
+    return from(CapacitorHttp.get(options)).pipe(
+      map((res: HttpResponse) => res.data),
       catchError(() => of([]))
     );
   }
 
-  // 2. Busca o preço pelo ID (V3 - Preço do Brasil)
   getPrecoV3(gameId: string): Observable<any> {
     if (!gameId) return of(null);
 
-    // Removi os headers manuais. 
-    // No PC, o navegador briga com o 'Content-Type' customizado em chamadas POST simples.
-    return this.http.post(
-      `${this.baseUrl}/games/prices/v3?key=${this.apiKey}&country=BR&nondeals=true`,
-      [gameId] // Passa o array direto, o Angular se vira
-    ).pipe(
-      timeout(5000),
+    const options = {
+      url: `${this.baseUrl}/games/prices/v3?key=${this.apiKey}&country=BR&nondeals=true`,
+      data: [String(gameId)],
+      headers: { 'Content-Type': 'application/json' }
+    };
+
+    return from(CapacitorHttp.post(options)).pipe(
+      map((res: HttpResponse) => res.data),
       catchError((err) => {
-        console.error('Erro na ITAD:', err);
-        return of(null);
+        console.error('Erro Nativo na ITAD:', err);
+        return of([]);
       })
     );
   }
