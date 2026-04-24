@@ -1,11 +1,13 @@
-import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonHeader, IonToolbar, IonTitle, IonContent, IonIcon, IonSpinner, IonBadge, IonButton } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { heartOutline, heart, flameOutline, shieldHalfOutline, logoXbox, star } from 'ionicons/icons';
 import { GameService } from '../services/game-service';
 import { FavoritesService } from '../services/favorites.service';
-import { firstValueFrom } from 'rxjs';
+import { Auth } from '@angular/fire/auth';
+import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-tab1',
@@ -14,7 +16,8 @@ import { firstValueFrom } from 'rxjs';
   standalone: true,
   imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonIcon, IonSpinner, IonBadge, IonButton, CommonModule]
 })
-export class Tab1Page implements OnInit {
+export class Tab1Page implements OnInit, OnDestroy {
+  // Listas de jogos
   listaEmAlta: any[] = [];
   listaAguardados: any[] = [];
   listaRPG: any[] = [];
@@ -24,9 +27,15 @@ export class Tab1Page implements OnInit {
   carregando: boolean = true;
   jogoBanner: any = null;
 
+  // Injeções
   private gameService = inject(GameService);
   private favService = inject(FavoritesService);
+  private auth = inject(Auth);
+  private router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
+
+  // Inscrição para monitorar favoritos em tempo real
+  private favSubscription?: Subscription;
 
   constructor() {
     addIcons({ heartOutline, heart, flameOutline, shieldHalfOutline, logoXbox, star });
@@ -36,75 +45,106 @@ export class Tab1Page implements OnInit {
     this.carregarHome();
   }
 
-  // Sincroniza os corações toda vez que você entrar na aba Home
-  async ionViewWillEnter() {
-    await this.atualizarTodosOsStatus();
+  ngOnDestroy() {
+    // Limpa a inscrição ao destruir o componente
+    if (this.favSubscription) {
+      this.favSubscription.unsubscribe();
+    }
   }
 
-  // Função para checar o status de favorito em todas as listas da Home
-  async atualizarTodosOsStatus() {
-    const favoritos = await firstValueFrom(this.favService.getFavorites());
-    if (!favoritos) return;
+  ionViewWillEnter() {
+    // Toda vez que entrar na aba, começamos a "ouvir" os favoritos do Firebase
+    this.favSubscription = this.favService.getFavorites().subscribe({
+      next: (favoritos) => {
+        this.sincronizarStatusFavoritos(favoritos);
+      },
+      error: (err) => console.error('Erro ao ouvir favoritos:', err)
+    });
+  }
 
-    const idsFav = favoritos.map(f => f.id);
+  ionViewWillLeave() {
+    // Para de ouvir ao sair da aba para economizar bateria/processamento
+    if (this.favSubscription) {
+      this.favSubscription.unsubscribe();
+    }
+  }
+
+  // Função mestre que marca os corações baseada no que vem do Firebase
+  sincronizarStatusFavoritos(favoritos: any[]) {
+    const idsFav = favoritos.map(f => String(f.id));
 
     // Sincroniza o Banner
     if (this.jogoBanner) {
-      this.jogoBanner.favorito = idsFav.includes(this.jogoBanner.id);
+      this.jogoBanner.favorito = idsFav.includes(String(this.jogoBanner.id));
     }
 
-    // Sincroniza as Listas
-    const listas = [this.listaEmAlta, this.listaAguardados, this.listaRPG, this.listaAcao, this.listaFamily];
-    listas.forEach(lista => {
+    // Sincroniza todas as listas de uma vez
+    const todasAsListas = [
+      this.listaEmAlta,
+      this.listaAguardados,
+      this.listaRPG,
+      this.listaAcao,
+      this.listaFamily
+    ];
+
+    todasAsListas.forEach(lista => {
       lista.forEach(jogo => {
-        jogo.favorito = idsFav.includes(jogo.id);
+        jogo.favorito = idsFav.includes(String(jogo.id));
       });
     });
 
     this.cdr.detectChanges();
   }
 
-  async toggleFavorito(jogo: any) {
-    jogo.favorito = !jogo.favorito;
+  toggleFavorito(jogo: any) {
+    // Verificação de Login (Ponto 2 do seu pedido)
+    if (!this.auth.currentUser) {
+      this.router.navigate(['/login']);
+      return;
+    }
 
-    try {
-      if (jogo.favorito) {
-        // Para a Home, passamos o objeto mapeado para o formato que o Favorito espera
-        // (ajuste conforme os campos que você usa no card dos favoritos)
-        await this.favService.addFavorite({
-          id: jogo.id,
-          nome: jogo.name,
-          thumb: jogo.background_image,
-          metacritic: jogo.metacritic
-        });
-      } else {
-        await this.favService.removeFavorite(jogo.id);
-      }
+    const estadoAnterior = jogo.favorito;
+    jogo.favorito = !estadoAnterior;
 
-      // Após clicar, garantimos que todas as listas reflitam a mudança (caso o jogo apareça em duas listas)
-      await this.atualizarTodosOsStatus();
-    } catch (error) {
-      console.error('Erro ao favoritar:', error);
-      jogo.favorito = !jogo.favorito; // Reverte em caso de erro
+    if (jogo.favorito) {
+      // Adiciona usando o novo padrão Observable
+      this.favService.addFavorite({
+        id: jogo.id,
+        name: jogo.name,
+        background_image: jogo.background_image,
+        metacritic: jogo.metacritic
+      }).subscribe({
+        next: () => console.log('Favoritado com sucesso'),
+        error: (err) => {
+          console.error('Erro ao favoritar:', err);
+          jogo.favorito = estadoAnterior; // Reverte se der erro
+        }
+      });
+    } else {
+      // Remove usando o novo padrão Observable
+      this.favService.removeFavorite(jogo.id).subscribe({
+        next: () => console.log('Removido com sucesso'),
+        error: (err) => {
+          console.error('Erro ao remover:', err);
+          jogo.favorito = estadoAnterior;
+        }
+      });
     }
   }
 
   carregarHome() {
     this.carregando = true;
 
+    // Banner Destaque
     this.gameService.getBannerDestaque().subscribe(res => {
       if (res.results && res.results.length > 0) {
-        const jogosValidos = res.results.filter((jogo: any) =>
-          jogo.background_image !== null &&
-          !jogo.name.includes('The Wolf Among Us 2')
-        );
-
-        const index = Math.floor(Math.random() * Math.min(jogosValidos.length, 3));
+        const jogosValidos = res.results.filter((j: any) => j.background_image !== null);
+        const index = Math.floor(Math.random() * Math.min(jogosValidos.length, 5));
         this.jogoBanner = jogosValidos[index];
       }
     });
 
-    // Encadeamento de chamadas (usando a lógica original de carregar tudo e depois sincronizar)
+    // Encadeamento de listas
     this.gameService.getProximosLancamentos().subscribe(res => {
       this.listaAguardados = res.results;
 
@@ -117,11 +157,8 @@ export class Tab1Page implements OnInit {
           this.gameService.getJogosPorGenero('2', 10, '-metacritic').subscribe(resRPG => {
             this.listaRPG = resRPG.results;
 
-            this.gameService.getJogosPorGenero('51', 10).subscribe(async resFamily => {
+            this.gameService.getJogosPorGenero('51', 10).subscribe(resFamily => {
               this.listaFamily = resFamily.results;
-
-              // AGORA SINCRONIZA TUDO
-              await this.atualizarTodosOsStatus();
 
               this.carregando = false;
               this.cdr.detectChanges();

@@ -8,18 +8,18 @@ import { AppComponent } from './app/app.component';
 import { provideHttpClient } from '@angular/common/http';
 
 // Imports do Firebase (Mantenha estes que já estavam aí)
-import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
-import { getAuth, provideAuth } from '@angular/fire/auth';
+import { getApp, initializeApp, provideFirebaseApp } from '@angular/fire/app';
+import { getAuth } from '@angular/fire/auth';
 import { getFirestore, provideFirestore } from '@angular/fire/firestore';
+import { initializeAuth, indexedDBLocalPersistence, provideAuth } from '@angular/fire/auth'; // Adicione estes
 
 bootstrapApplication(AppComponent, {
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     provideIonicAngular(),
     provideRouter(routes, withPreloading(PreloadAllModules)),
+    provideHttpClient(),
 
-    provideHttpClient(), // <-- Adicione esta linha para habilitar o HttpClient em todo o app
-    // Configuração que o terminal gerou para você:
     provideFirebaseApp(() => initializeApp({
       projectId: "goldoffers-2514c",
       appId: "1:595841397954:web:e96d11ee72673584f9775b",
@@ -28,7 +28,15 @@ bootstrapApplication(AppComponent, {
       authDomain: "goldoffers-2514c.firebaseapp.com",
       messagingSenderId: "595841397954"
     })),
-    provideAuth(() => getAuth()),
+
+    // CONFIGURAÇÃO DE PERSISTÊNCIA REFORÇADA:
+    provideAuth(() => {
+      const auth = initializeAuth(getApp(), {
+        persistence: indexedDBLocalPersistence
+      });
+      return auth;
+    }),
+
     provideFirestore(() => getFirestore()),
   ],
 });

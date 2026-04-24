@@ -1,72 +1,58 @@
-import { Injectable, inject, Injector, runInInjectionContext } from '@angular/core';
-import { Firestore, collection, doc, setDoc, deleteDoc, collectionData, query } from '@angular/fire/firestore';
-import { Auth } from '@angular/fire/auth';
-import { Observable, of } from 'rxjs';
-import { map, switchMap } from 'rxjs/operators';
-import { ItadService } from './itad'; // ajuste o caminho se necessário
-import { firstValueFrom } from 'rxjs';
+import { Injectable, inject } from '@angular/core';
+import { Firestore, collection, doc, setDoc, deleteDoc, collectionData } from '@angular/fire/firestore';
+import { Auth, authState } from '@angular/fire/auth';
+import { Observable, of, from } from 'rxjs';
+import { switchMap, catchError, take, map } from 'rxjs/operators';
+import { ItadService } from './itad';
 
-@Injectable({
-    providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class FavoritesService {
-    private injector = inject(Injector);
-    private itadService = inject(ItadService);
     private firestore = inject(Firestore);
     private auth = inject(Auth);
+    private itadService = inject(ItadService);
 
     constructor() { }
 
-    // Adicionar aos favoritos (Salva o objeto do jogo no Firestore)
-    async addFavorite(jogo: any) {
+    // Retorna a lista de favoritos do usuário logado em tempo real
+    getFavorites(): Observable<any[]> {
+        return authState(this.auth).pipe(
+            switchMap(user => {
+                if (!user) return of([]); // Se não estiver logado, retorna lista vazia
+
+                // Caminho no Firebase: usuarios -> {seu_uid} -> favoritos
+                const favCollection = collection(this.firestore, `usuarios/${user.uid}/favoritos`);
+                return collectionData(favCollection, { idField: 'id' });
+            }),
+            catchError(() => of([]))
+        );
+    }
+
+    // Adiciona o jogo direto na subcoleção do usuário no banco de dados
+    addFavorite(jogo: any): Observable<void> {
         const user = this.auth.currentUser;
-        if (!user) return;
+        if (!user) return of(undefined);
 
-        // NOVIDADE: Buscar o ID da ITAD antes de salvar
-        let itadId = null;
-        try {
-            const buscaItad = await firstValueFrom(this.itadService.buscarJogos(jogo.name || jogo.nome));
-            if (buscaItad && buscaItad.length > 0) {
-                itadId = buscaItad[0].id; // O ID real que a ITAD entende
-            }
-        } catch (e) {
-            console.error("Não achou ID na ITAD", e);
-        }
-
+        // Aqui definimos o "Caminho das Pedras"
+        // usuarios -> UID do Guilherme -> favoritos -> ID do Jogo
         const favRef = doc(this.firestore, `usuarios/${user.uid}/favoritos/${jogo.id}`);
 
-        return setDoc(favRef, {
-            id: jogo.id,
-            itadId: itadId, // AGORA SALVAMOS O ID CERTO!
-            nome: jogo.name || jogo.nome,
-            thumb: jogo.background_image || jogo.thumb,
-            metacritic: jogo.metacritic || null,
-            adicionadoEm: new Date()
-        });
+        const dados = {
+            id: String(jogo.id),
+            nome: jogo.nome || jogo.name,
+            thumb: jogo.thumb || jogo.background_image,
+            adicionadoEm: new Date().toISOString()
+        };
+
+        // O comando 'setDoc' é quem cria as pastas no site do Firebase automaticamente
+        return from(setDoc(favRef, dados));
     }
 
-    // Remover dos favoritos
-    async removeFavorite(jogoId: string | number) {
+    // Remove o jogo da subcoleção do usuário
+    removeFavorite(jogoId: string | number): Observable<void> {
         const user = this.auth.currentUser;
-        if (!user) return;
+        if (!user) return of(undefined);
 
         const favRef = doc(this.firestore, `usuarios/${user.uid}/favoritos/${jogoId}`);
-        return deleteDoc(favRef);
-    }
-
-    // Listar favoritos do usuário logado em tempo real
-    getFavorites(): Observable<any[]> {
-        return of(this.auth.currentUser).pipe(
-            switchMap(user => {
-                if (!user) return of([]);
-
-                // O truque mágico: runInInjectionContext
-                // Isso força o Firebase a rodar dentro do "clima" do Angular
-                return runInInjectionContext(this.injector, () => {
-                    const favCollection = collection(this.firestore, `usuarios/${user.uid}/favoritos`);
-                    return collectionData(favCollection);
-                });
-            })
-        );
+        return from(deleteDoc(favRef));
     }
 }

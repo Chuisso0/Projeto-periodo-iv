@@ -6,7 +6,8 @@ import { searchOutline, heartOutline, heart, openOutline } from 'ionicons/icons'
 import { GameService } from '../services/game-service';
 import { ItadService } from '../services/itad';
 import { FavoritesService } from '../services/favorites.service';
-import { firstValueFrom } from 'rxjs';
+import { Auth } from '@angular/fire/auth'; // <--- ADICIONADO
+import { Router } from '@angular/router'; // <--- ADICIONADO
 
 @Component({
   selector: 'app-tab2',
@@ -23,32 +24,33 @@ export class Tab2Page {
   private gameService = inject(GameService);
   private itadService = inject(ItadService);
   private cdr = inject(ChangeDetectorRef);
+  private auth = inject(Auth); // <--- ADICIONADO
+  private router = inject(Router); // <--- ADICIONADO
 
   constructor() {
     addIcons({ searchOutline, heartOutline, heart, openOutline });
   }
 
-  // Sincroniza os ícones de coração sempre que a página ganhar foco
   async ionViewWillEnter() {
     if (this.resultados.length > 0) {
-      await this.sincronizarFavoritos();
+      this.sincronizarFavoritos();
     }
   }
 
-  // Função para checar quais jogos dos resultados já estão nos favoritos
-  async sincronizarFavoritos() {
-    try {
-      const favoritos = await firstValueFrom(this.favService.getFavorites());
-      if (favoritos) {
-        const idsFavoritos = favoritos.map(f => f.id);
-        this.resultados.forEach(jogo => {
-          jogo.favorito = idsFavoritos.includes(jogo.id);
-        });
-        this.cdr.detectChanges();
-      }
-    } catch (error) {
-      console.error('Erro ao sincronizar favoritos:', error);
-    }
+  // MUDANÇA: Usando subscribe para evitar erro de Injection Context
+  sincronizarFavoritos() {
+    this.favService.getFavorites().subscribe({
+      next: (favoritos) => {
+        if (favoritos) {
+          const idsFavoritos = favoritos.map(f => String(f.id));
+          this.resultados.forEach(jogo => {
+            jogo.favorito = idsFavoritos.includes(String(jogo.id));
+          });
+          this.cdr.detectChanges();
+        }
+      },
+      error: (err) => console.error('Erro ao sincronizar favoritos:', err)
+    });
   }
 
   pesquisarJogo(termo: any) {
@@ -65,7 +67,6 @@ export class Tab2Page {
         const idsVistos = new Set();
         const termoBusca = termo.toLowerCase().trim();
 
-        // 1. Mapeamento inicial dos dados da RAWG
         const jogosMapeados = res.results
           .filter((j: any) => {
             const nomeJogo = j.name.toLowerCase();
@@ -96,8 +97,7 @@ export class Tab2Page {
 
         this.resultados = jogosMapeados;
 
-        // Sincroniza corações imediatamente após carregar a lista
-        await this.sincronizarFavoritos();
+        this.sincronizarFavoritos();
 
         if (this.resultados.length === 0) {
           this.carregando = false;
@@ -105,13 +105,10 @@ export class Tab2Page {
           return;
         }
 
-        // 2. Busca de preços na ITAD para cada jogo filtrado
         this.resultados.forEach(jogo => {
           this.itadService.buscarJogos(jogo.nome).subscribe(itadRes => {
             if (itadRes && itadRes.length > 0) {
               const nomeBuscaLimpo = jogo.nome.toLowerCase().trim();
-
-              // Busca o melhor match de nome
               let melhorMatch = itadRes.find((res: any) => res.title.toLowerCase().trim() === nomeBuscaLimpo);
               if (!melhorMatch) {
                 melhorMatch = itadRes.find((res: any) => res.title.toLowerCase().includes(nomeBuscaLimpo));
@@ -120,13 +117,10 @@ export class Tab2Page {
               const itadId = melhorMatch ? melhorMatch.id : itadRes[0].id;
               jogo.itadId = itadId;
 
-              // Passamos o ID garantindo que é uma string
               this.itadService.getPrecoV3(String(itadId)).subscribe({
                 next: (res: any[]) => {
                   if (res && res.length > 0) {
-                    // Usamos '==' para evitar problemas de tipo String vs Number no ID
                     const gameInfo = res.find(item => item.id == itadId);
-
                     if (gameInfo && gameInfo.deals && gameInfo.deals.length > 0) {
                       const ofertasFiltradas = gameInfo.deals.filter((d: any) => {
                         const moedaBRL = d.price?.currency === 'BRL' || d.regular?.currency === 'BRL';
@@ -195,17 +189,31 @@ export class Tab2Page {
     });
   }
 
+  // MUDANÇA: Trava de login adicionada aqui
   async toggleFavorito(jogo: any) {
-    jogo.favorito = !jogo.favorito;
-    try {
-      if (jogo.favorito) {
-        await this.favService.addFavorite(jogo);
-      } else {
-        await this.favService.removeFavorite(jogo.id);
-      }
-    } catch (error) {
-      console.error('Erro ao favoritar:', error);
-      jogo.favorito = !jogo.favorito;
+    if (!this.auth.currentUser) {
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    const estadoOriginal = jogo.favorito;
+    jogo.favorito = !estadoOriginal;
+
+    // Usando subscribe para combinar com o novo Service reativo
+    if (jogo.favorito) {
+      this.favService.addFavorite(jogo).subscribe({
+        error: (err) => {
+          console.error('Erro ao favoritar:', err);
+          jogo.favorito = estadoOriginal;
+        }
+      });
+    } else {
+      this.favService.removeFavorite(jogo.id).subscribe({
+        error: (err) => {
+          console.error('Erro ao remover:', err);
+          jogo.favorito = estadoOriginal;
+        }
+      });
     }
   }
 
