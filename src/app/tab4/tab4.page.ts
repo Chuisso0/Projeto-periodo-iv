@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonHeader, IonTitle, IonItem, IonButton, IonList, IonIcon, IonAvatar, IonLabel, IonToolbar } from '@ionic/angular/standalone';
+import { IonContent, IonHeader, IonTitle, IonItem, IonButton, IonList, IonIcon, IonAvatar, IonLabel, IonToolbar, IonModal, IonButtons } from '@ionic/angular/standalone';
 import { Router, RouterModule } from '@angular/router'; // <-- Router para navegar
 
 // IMPORTS DO FIREBASE
@@ -13,9 +13,16 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
   templateUrl: './tab4.page.html',
   styleUrls: ['./tab4.page.scss'],
   standalone: true,
-  imports: [IonContent, IonHeader, IonTitle, IonItem, IonButton, IonList, IonIcon, IonAvatar, IonLabel, IonToolbar, CommonModule, FormsModule, RouterModule]
+  imports: [IonContent, IonHeader, IonTitle, IonItem, IonButton, IonList, IonIcon, IonAvatar, IonLabel, IonToolbar, CommonModule, FormsModule, RouterModule, IonModal, IonButtons]
 })
 export class Tab4Page implements OnInit {
+  isModalOpen = false;
+
+  setOpen(isOpen: boolean) {
+    this.isModalOpen = isOpen;
+  }
+
+
   private auth = inject(Auth);
   private firestore = inject(Firestore);
   private router = inject(Router);

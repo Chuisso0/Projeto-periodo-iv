@@ -4,18 +4,60 @@
     <ion-avatar>
       <img src="../../assets/images/perfil.png" alt="Foto de Perfil">
     </ion-avatar>
-
-    <!-- Aqui a mágica acontece: trocamos o texto fixo pelas variáveis -->
     <h3>{{ nome }}</h3>
     <p>{{ email }}</p>
-
   </div>
 
   <div class="botoes-acao">
-    <ion-button routerLink="/login" class="btn-opcao">Configuração</ion-button>
-
-    <!-- Trocamos o routerLink pelo (click) chamando a nossa função de Sair -->
     <ion-button (click)="sair()" class="btn-opcao btn-sair">Sair da conta</ion-button>
   </div>
+
+  <div class="link-desenvolvedores">
+    <p (click)="setOpen(true)">Sobre os Desenvolvedores</p>
+  </div>
+
+  <ion-modal [isOpen]="isModalOpen" (didDismiss)="setOpen(false)">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Equipe GoldOffers</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="setOpen(false)">Fechar</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="ion-padding modal-grupo">
+        <div class="membros-lista">
+          <div class="membro-item">
+            <ion-avatar>
+              <img src="../../assets/images/foto-guilherme.jpeg" />
+            </ion-avatar>
+            <ion-label>
+              <h2>Guilherme Chuisso</h2>
+              <p>ADS - 4º Período</p>
+            </ion-label>
+          </div>
+
+          <div class="membro-item">
+            <ion-avatar>
+              <img src="../../assets/images/foto-roger.jpg" />
+            </ion-avatar>
+            <ion-label>
+              <h2>Rogério Dorcelino</h2>
+              <p>ADS - 4º Período</p>
+            </ion-label>
+          </div>
+        </div>
+
+        <div class="info-projeto">
+          <p><strong>UNISUAM - ADS</strong></p>
+          <p>4º Período | Manhã</p>
+          <p>Unidade: Campo Grande</p>
+          <p>Professor: Charles</p>
+        </div>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
 
 </ion-content>

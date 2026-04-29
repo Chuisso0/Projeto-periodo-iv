@@ -135,30 +135,46 @@ export class Tab1Page implements OnInit, OnDestroy {
   carregarHome() {
     this.carregando = true;
 
-    // Banner Destaque
+    // --- 1. BANNER DE DESTAQUE (QUALIDADE MÁXIMA) ---
     this.gameService.getBannerDestaque().subscribe(res => {
       if (res.results && res.results.length > 0) {
+        // Filtramos apenas jogos com imagem
         const jogosValidos = res.results.filter((j: any) => j.background_image !== null);
+
+        // Sorteamos um dos primeiros 5 destaques
         const index = Math.floor(Math.random() * Math.min(jogosValidos.length, 5));
+
+        // AQUI ESTÁ O AJUSTE: Pegamos a imagem original da RAWG (sem replace)
         this.jogoBanner = jogosValidos[index];
       }
     });
 
-    // Encadeamento de listas
+    // --- 2. LISTAS (QUALIDADE OTIMIZADA PARA PERFORMANCE) ---
+
+    // Função auxiliar para tratar apenas as imagens das listas menores
+    const tratarListaParaPerformance = (lista: any[]) => lista.map(j => {
+      if (j.background_image) {
+        // Reduzimos para 640px apenas aqui nas listas secundárias
+        j.background_image = j.background_image.replace('/media/', '/media/resize/640/-/');
+      }
+      return j;
+    });
+
+    // Encadeamento das listas com o tratamento de performance
     this.gameService.getProximosLancamentos().subscribe(res => {
-      this.listaAguardados = res.results;
+      this.listaAguardados = tratarListaParaPerformance(res.results);
 
       this.gameService.getHomeHype().subscribe(res => {
-        this.listaEmAlta = res.results;
+        this.listaEmAlta = tratarListaParaPerformance(res.results);
 
         this.gameService.getJogosPorGenero('3', 10).subscribe(resAcao => {
-          this.listaAcao = resAcao.results;
+          this.listaAcao = tratarListaParaPerformance(resAcao.results);
 
           this.gameService.getJogosPorGenero('2', 10, '-metacritic').subscribe(resRPG => {
-            this.listaRPG = resRPG.results;
+            this.listaRPG = tratarListaParaPerformance(resRPG.results);
 
             this.gameService.getJogosPorGenero('51', 10).subscribe(resFamily => {
-              this.listaFamily = resFamily.results;
+              this.listaFamily = tratarListaParaPerformance(resFamily.results);
 
               this.carregando = false;
               this.cdr.detectChanges();

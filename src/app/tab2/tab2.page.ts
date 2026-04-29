@@ -85,7 +85,7 @@ export class Tab2Page {
           .map((j: any) => ({
             id: j.id,
             nome: j.name,
-            thumb: j.background_image,
+            thumb: j.background_image ? j.background_image.replace('/media/', '/media/resize/640/-/') : '../../assets/images/placeholder.png',
             metacritic: j.metacritic,
             precoReal: 'Carregando...',
             loja: '',

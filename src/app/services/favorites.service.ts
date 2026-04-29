@@ -4,6 +4,7 @@ import { Auth, authState } from '@angular/fire/auth';
 import { Observable, of, from } from 'rxjs';
 import { switchMap, catchError, take, map } from 'rxjs/operators';
 import { ItadService } from './itad';
+import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
 
 @Injectable({ providedIn: 'root' })
 export class FavoritesService {
@@ -55,4 +56,41 @@ export class FavoritesService {
         const favRef = doc(this.firestore, `usuarios/${user.uid}/favoritos/${jogoId}`);
         return from(deleteDoc(favRef));
     }
+
+   async exportarParaArquivo(jogos: any[]) {
+    const dataAtual = new Date().toLocaleString('pt-BR');
+    let corpoTexto = `GOLDOFFERS - RELATÓRIO DE PREÇOS\n`;
+    corpoTexto += `Exportado em: ${dataAtual}\n`;
+    corpoTexto += `------------------------------------------\n\n`;
+
+    jogos.forEach((jogo, index) => {
+      corpoTexto += `${index + 1}. ${jogo.nome.toUpperCase()}\n`;
+      
+      // Pega o preço que o componente Tab3 preencheu
+      const preco = jogo.precoReal || 'Preço não carregado';
+      const loja = jogo.loja ? `na ${jogo.loja}` : '';
+      
+      corpoTexto += `   Valor Atual: ${preco} ${loja}\n`;
+      
+      if (jogo.temPromocao && jogo.precoAntigo) {
+        corpoTexto += `   PROMOÇÃO! (Preço original: ${jogo.precoAntigo})\n`;
+      }
+
+      corpoTexto += `   ID: ${jogo.id}\n`;
+      corpoTexto += `------------------------------------------\n`;
+    });
+
+    try {
+      await Filesystem.writeFile({
+        path: 'meus-favoritos.txt',
+        data: corpoTexto,
+        directory: Directory.Documents,
+        encoding: Encoding.UTF8,
+      });
+      return true;
+    } catch (error) {
+      return false;
+    }
 }
+}
+

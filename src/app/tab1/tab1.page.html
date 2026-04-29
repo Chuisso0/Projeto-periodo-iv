@@ -27,7 +27,7 @@
   <h3 class="ion-padding-horizontal">🚀 Mais Aguardados</h3>
   <div class="listas">
     <div class="card-jogo" *ngFor="let jogo of listaAguardados">
-      <img [src]="jogo.background_image" [alt]="jogo.name">
+      <img [src]="jogo.background_image" [alt]="jogo.name" loading="lazy">
       <div class="info-jogo">
         <div class="textos">
           <h4>{{ jogo.name }}</h4>
@@ -53,7 +53,7 @@
   <h3 class="ion-padding-horizontal">🔥 Lançamentos</h3>
   <div class="listas">
     <div class="card-jogo" *ngFor="let jogo of listaEmAlta">
-      <img [src]="jogo.background_image" [alt]="jogo.name">
+      <img [src]="jogo.background_image" [alt]="jogo.name" loading="lazy">
       <div class="info-jogo">
         <div class="textos">
           <h4>{{ jogo.name }}</h4>
@@ -73,7 +73,7 @@
   <h3 class="ion-padding-horizontal">🎯 Aventuras boas essas</h3>
   <div class="listas">
     <div class="card-jogo" *ngFor="let jogo of listaAcao">
-      <img [src]="jogo.background_image" [alt]="jogo.name">
+      <img [src]="jogo.background_image" [alt]="jogo.name" loading="lazy">
       <div class="info-jogo">
         <div class="textos">
           <h4>{{ jogo.name }}</h4>
@@ -91,7 +91,7 @@
   <h3 class="ion-padding-horizontal">⚔️ Um Shooter, se preferir</h3>
   <div class="listas">
     <div class="card-jogo" *ngFor="let jogo of listaRPG">
-      <img [src]="jogo.background_image" [alt]="jogo.name">
+      <img [src]="jogo.background_image" [alt]="jogo.name" loading="lazy">
       <div class="info-jogo">
         <div class="textos">
           <h4>{{ jogo.name }}</h4>
@@ -109,7 +109,7 @@
   <h3 class="ion-padding-horizontal">👨‍👩‍👧 Só os Indie</h3>
   <div class="listas">
     <div class="card-jogo" *ngFor="let jogo of listaFamily">
-      <img [src]="jogo.background_image" [alt]="jogo.name">
+      <img [src]="jogo.background_image" [alt]="jogo.name" loading="lazy">
       <div class="info-jogo">
         <div class="textos">
           <h4>{{ jogo.name }}</h4>

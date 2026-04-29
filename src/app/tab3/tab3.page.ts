@@ -1,125 +1,113 @@
 import { Component, ChangeDetectorRef, inject } from '@angular/core';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonThumbnail, IonLabel, IonButton, IonIcon, IonBadge, IonSpinner } from '@ionic/angular/standalone';
+import { 
+  IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, 
+  IonThumbnail, IonLabel, IonButton, IonIcon, IonBadge, IonSpinner, 
+  IonButtons, ToastController 
+} from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
 import { addIcons } from 'ionicons';
-import { openOutline, heart, heartDislikeOutline } from 'ionicons/icons';
+import { openOutline, heart, heartDislikeOutline, downloadOutline } from 'ionicons/icons';
 import { FavoritesService } from '../services/favorites.service';
 import { ItadService } from '../services/itad';
-import { Observable, firstValueFrom } from 'rxjs';
+import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-tab3',
   templateUrl: 'tab3.page.html',
   styleUrls: ['tab3.page.scss'],
   standalone: true,
-  imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonThumbnail, IonLabel, IonButton, IonIcon, IonBadge, IonSpinner, CommonModule]
+  imports: [
+    IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, 
+    IonThumbnail, IonLabel, IonButton, IonIcon, IonBadge, IonSpinner, 
+    IonButtons, CommonModule, RouterModule
+  ]
 })
 export class Tab3Page {
   private favService = inject(FavoritesService);
   private itadService = inject(ItadService);
   private cdr = inject(ChangeDetectorRef);
+  private toastCtrl = inject(ToastController);
 
   meusFavoritos$: Observable<any[]>;
+  private listaComDadosCompletos: any[] = []; // Onde guardaremos os preços
 
   constructor() {
-    addIcons({ openOutline, heart, heartDislikeOutline });
+    addIcons({ openOutline, heart, heartDislikeOutline, downloadOutline });
 
     this.meusFavoritos$ = this.favService.getFavorites().pipe(
       tap(jogos => {
+        // Toda vez que o Firebase muda, atualizamos nossa lista de referência
+        this.listaComDadosCompletos = jogos; 
+        
         if (jogos) {
-          jogos.forEach(jogo => this.buscarPrecoSeNecessario(jogo));
+          jogos.forEach(jogo => {
+            if (jogo.thumb && jogo.thumb.includes('/media/')) {
+              jogo.thumb = jogo.thumb.replace('/media/', '/media/resize/640/-/');
+            }
+            this.buscarPrecoSeNecessario(jogo);
+          });
         }
       })
     );
   }
 
+  async gerarRelatorio() {
+    if (this.listaComDadosCompletos.length === 0) {
+      const toast = await this.toastCtrl.create({
+        message: 'Sua lista está vazia.',
+        duration: 2000,
+        color: 'warning'
+      });
+      toast.present();
+      return;
+    }
+
+    // Chamamos o serviço passando a lista que já foi "enriquecida" com os preços
+    const sucesso = await this.favService.exportarParaArquivo(this.listaComDadosCompletos);
+
+    if (sucesso) {
+      alert("Relatório gerado! Verifique a pasta Documentos do celular.");
+    } else {
+      alert("Erro ao salvar o arquivo.");
+    }
+  }
+
   private buscarPrecoSeNecessario(jogo: any) {
-    // Se já estiver carregando ou já tiver o preço final, não busca de novo
-    if (jogo.precoReal &&
-      jogo.precoReal !== 'Buscando...' &&
-      jogo.precoReal !== 'Monitorando preço...') return;
+    if (jogo.precoReal && 
+        jogo.precoReal !== 'Buscando...' && 
+        jogo.precoReal !== 'Monitorando preço...') return;
 
     jogo.precoReal = 'Buscando...';
 
     this.itadService.buscarJogos(jogo.nome).subscribe({
       next: (itadRes) => {
         if (itadRes && itadRes.length > 0) {
-          const nomeBuscaLimpo = jogo.nome.toLowerCase().trim();
-          let melhorMatch = itadRes.find((res: any) => res.title.toLowerCase().trim() === nomeBuscaLimpo);
-
-          if (!melhorMatch) {
-            melhorMatch = itadRes.find((res: any) => res.title.toLowerCase().includes(nomeBuscaLimpo));
-          }
-
-          const itadId = melhorMatch ? melhorMatch.id : itadRes[0].id;
-          jogo.itadId = itadId;
-
-          // Chamada de preço com tratamento para Mobile
+          const itadId = itadRes[0].id;
           this.itadService.getPrecoV3(String(itadId)).subscribe({
             next: (res: any[]) => {
               if (res && res.length > 0) {
-                // '==' para evitar erro de tipo String vs Number
                 const gameInfo = res.find(item => item.id == itadId);
-
                 if (gameInfo && gameInfo.deals && gameInfo.deals.length > 0) {
-                  const ofertasFiltradas = gameInfo.deals.filter((d: any) => {
-                    const moedaBRL = d.price?.currency === 'BRL' || d.regular?.currency === 'BRL';
-                    const nomeLoja = d.shop.name.toLowerCase();
-                    const ehIndieGala = d.shop.id === 43 || nomeLoja.includes('indiegala') || nomeLoja.includes('indie gala');
-                    return moedaBRL && !ehIndieGala;
-                  });
-
-                  if (ofertasFiltradas.length > 0) {
-                    const ordemPrioridade = [50, 61, 18, 35, 74];
-                    ofertasFiltradas.sort((a: any, b: any) => {
-                      const precoA = a.price?.amount || a.regular?.amount;
-                      const precoB = b.price?.amount || b.regular?.amount;
-                      if (precoA !== precoB) return precoA - precoB;
-                      const pA = ordemPrioridade.indexOf(a.shop.id) === -1 ? 99 : ordemPrioridade.indexOf(a.shop.id);
-                      const pB = ordemPrioridade.indexOf(b.shop.id) === -1 ? 99 : ordemPrioridade.indexOf(b.shop.id);
-                      return pA - pB;
-                    });
-
-                    const melhor = ofertasFiltradas[0];
-                    const precoAtual = melhor.price?.amount || 0;
-                    const precoOriginal = melhor.regular?.amount || 0;
-
-                    if (precoAtual < precoOriginal) {
-                      jogo.temPromocao = true;
-                      jogo.precoAntigo = `R$ ${precoOriginal.toFixed(2).replace('.', ',')}`;
-                    } else {
-                      jogo.temPromocao = false;
-                      jogo.precoAntigo = null;
-                    }
-
-                    jogo.precoReal = `R$ ${precoAtual.toFixed(2).replace('.', ',')}`;
-                    jogo.loja = melhor.shop.name;
-                    jogo.linkLoja = melhor.url;
-                  } else {
-                    jogo.precoReal = 'Indisponível em R$';
+                  const melhor = gameInfo.deals[0];
+                  
+                  // AQUI: Preenchemos os dados no objeto que está na listaComDadosCompletos
+                  jogo.precoReal = `R$ ${melhor.price.amount.toFixed(2).replace('.', ',')}`;
+                  jogo.loja = melhor.shop.name;
+                  jogo.linkLoja = melhor.url;
+                  
+                  // Se tiver promoção, pegamos o preço antigo também
+                  if (melhor.price.amount < melhor.regular.amount) {
+                    jogo.temPromocao = true;
+                    jogo.precoAntigo = `R$ ${melhor.regular.amount.toFixed(2).replace('.', ',')}`;
                   }
-                } else {
-                  jogo.precoReal = 'Sem ofertas ativas';
                 }
-              } else {
-                jogo.precoReal = 'N/A';
               }
-              this.cdr.detectChanges();
-            },
-            error: () => {
-              jogo.precoReal = 'Erro API';
               this.cdr.detectChanges();
             }
           });
-        } else {
-          jogo.precoReal = 'N/A';
-          this.cdr.detectChanges();
         }
-      },
-      error: () => {
-        jogo.precoReal = 'N/A';
-        this.cdr.detectChanges();
       }
     });
   }
@@ -127,9 +115,8 @@ export class Tab3Page {
   async remover(jogoId: any) {
     try {
       await this.favService.removeFavorite(jogoId);
-      // O Observable meusFavoritos$ atualizará a lista automaticamente
     } catch (error) {
-      console.error('Erro ao remover favorito:', error);
+      console.error('Erro ao remover:', error);
     }
   }
 }

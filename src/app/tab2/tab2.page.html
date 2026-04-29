@@ -13,7 +13,7 @@
     <div class="card-pesquisa" *ngFor="let jogo of resultados">
 
       <div class="thumb-wrapper">
-        <img [src]="jogo.thumb" [alt]="jogo.nome" />
+        <img [src]="jogo.thumb" [alt]="jogo.nome" loading="lazy" />
       </div>
 
       <div class="info-jogo">
