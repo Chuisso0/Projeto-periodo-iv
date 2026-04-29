@@ -64,14 +64,14 @@ A aplicação centraliza dados de múltiplas lojas, permitindo que o usuário:
 ### 🎨 Design (Wireframes)
 
 Protótipos desenvolvidos no Figma:
-🔗 **Link:** [https://www.figma.com/design/MlKQbohNyiEDDJZuUhtcWt/Untitled?node-id=0-1&p=f&m=draw]
+🔗 **Link:** [Figma](https://www.figma.com/design/MlKQbohNyiEDDJZuUhtcWt/Untitled?node-id=0-1&p=f&m=draw)
 
 ---
 
 ### 📲 Aplicativo (Android)
 
 Arquivo APK pronto para instalação:
-📥 **Download:** [COLE_LINK_DO_APK_AQUI]
+📥 **Download:** [APK](./GoldOffers.apk)
 
 ---
 
@@ -119,7 +119,7 @@ npx cap run android
 
 A documentação técnica completa (PDF), seguindo normas ABNT, está disponível na raiz do projeto:
 
-📥 **Download:** [COLE_LINK_DO_PDF_AQUI]
+📥 **Download:** [PDF](./PDF-PROJETO.pdf)
 
 ---
 
