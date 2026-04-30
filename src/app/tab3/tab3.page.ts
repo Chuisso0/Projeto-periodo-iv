@@ -1,8 +1,8 @@
 import { Component, ChangeDetectorRef, inject } from '@angular/core';
-import { 
-  IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, 
-  IonThumbnail, IonLabel, IonButton, IonIcon, IonBadge, IonSpinner, 
-  IonButtons, ToastController 
+import {
+  IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem,
+  IonThumbnail, IonLabel, IonButton, IonIcon, IonBadge, IonSpinner,
+  IonButtons, ToastController
 } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
 import { addIcons } from 'ionicons';
@@ -12,6 +12,7 @@ import { ItadService } from '../services/itad';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { RouterModule } from '@angular/router';
+import { NotificationService } from '../services/notification';
 
 @Component({
   selector: 'app-tab3',
@@ -19,12 +20,13 @@ import { RouterModule } from '@angular/router';
   styleUrls: ['tab3.page.scss'],
   standalone: true,
   imports: [
-    IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, 
-    IonThumbnail, IonLabel, IonButton, IonIcon, IonBadge, IonSpinner, 
+    IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem,
+    IonThumbnail, IonLabel, IonButton, IonIcon, IonBadge, IonSpinner,
     IonButtons, CommonModule, RouterModule
   ]
 })
 export class Tab3Page {
+  private notificationService = inject(NotificationService);
   private favService = inject(FavoritesService);
   private itadService = inject(ItadService);
   private cdr = inject(ChangeDetectorRef);
@@ -33,14 +35,29 @@ export class Tab3Page {
   meusFavoritos$: Observable<any[]>;
   private listaComDadosCompletos: any[] = []; // Onde guardaremos os preços
 
+  verificarPromocoes(favoritos: any[]) {
+    favoritos.forEach(jogo => {
+      // Lógica: Se o preço atual for menor que o preço original/base
+      if (jogo.preco_atual < jogo.preco_original) {
+        const desconto = Math.round((1 - (jogo.preco_atual / jogo.preco_original)) * 100);
+
+        // Dispara a notificação local
+        this.notificationService.sendPriceAlert(
+          jogo.nome,
+          `R$ ${jogo.preco_atual} (${desconto}% OFF!)`
+        );
+      }
+    });
+  }
+
   constructor() {
     addIcons({ openOutline, heart, heartDislikeOutline, downloadOutline });
 
     this.meusFavoritos$ = this.favService.getFavorites().pipe(
       tap(jogos => {
         // Toda vez que o Firebase muda, atualizamos nossa lista de referência
-        this.listaComDadosCompletos = jogos; 
-        
+        this.listaComDadosCompletos = jogos;
+
         if (jogos) {
           jogos.forEach(jogo => {
             if (jogo.thumb && jogo.thumb.includes('/media/')) {
@@ -75,9 +92,9 @@ export class Tab3Page {
   }
 
   private buscarPrecoSeNecessario(jogo: any) {
-    if (jogo.precoReal && 
-        jogo.precoReal !== 'Buscando...' && 
-        jogo.precoReal !== 'Monitorando preço...') return;
+    if (jogo.precoReal &&
+      jogo.precoReal !== 'Buscando...' &&
+      jogo.precoReal !== 'Monitorando preço...') return;
 
     jogo.precoReal = 'Buscando...';
 
@@ -91,16 +108,27 @@ export class Tab3Page {
                 const gameInfo = res.find(item => item.id == itadId);
                 if (gameInfo && gameInfo.deals && gameInfo.deals.length > 0) {
                   const melhor = gameInfo.deals[0];
-                  
-                  // AQUI: Preenchemos os dados no objeto que está na listaComDadosCompletos
-                  jogo.precoReal = `R$ ${melhor.price.amount.toFixed(2).replace('.', ',')}`;
+
+                  const precoAtual = melhor.price.amount;
+                  const precoOriginal = melhor.regular.amount;
+
+                  jogo.precoReal = `R$ ${precoAtual.toFixed(2).replace('.', ',')}`;
                   jogo.loja = melhor.shop.name;
                   jogo.linkLoja = melhor.url;
-                  
-                  // Se tiver promoção, pegamos o preço antigo também
-                  if (melhor.price.amount < melhor.regular.amount) {
+
+                  // --- LÓGICA DA NOTIFICAÇÃO INOVADORA ---
+                  if (precoAtual < precoOriginal) {
                     jogo.temPromocao = true;
-                    jogo.precoAntigo = `R$ ${melhor.regular.amount.toFixed(2).replace('.', ',')}`;
+                    jogo.precoAntigo = `R$ ${precoOriginal.toFixed(2).replace('.', ',')}`;
+
+                    // Calcula a porcentagem de desconto
+                    const desconto = Math.round((1 - (precoAtual / precoOriginal)) * 100);
+
+                    // Dispara o alerta no celular
+                    this.notificationService.sendPriceAlert(
+                      jogo.nome,
+                      `Está em promoção por R$ ${precoAtual.toFixed(2).replace('.', ',')} (${desconto}% OFF!)`
+                    );
                   }
                 }
               }

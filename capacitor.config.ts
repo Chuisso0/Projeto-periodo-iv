@@ -1,8 +1,8 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.seuapp.id', // Mantive o seu ID original
-  appName: 'Projeto-iv',
+  appId: 'com.Goldoffers.id', // Mantive o seu ID original
+  appName: 'GoldOffers',
   webDir: 'www',
   server: {
     androidScheme: 'https',

@@ -1,13 +1,12 @@
 import { Routes } from '@angular/router';
 
 export const routes: Routes = [
-  // 1. Quando o app abrir (caminho vazio ''), ele redireciona para o loader
+  // Mude o redirecionamento fixo ou remova-o para deixar o AppComponent decidir
   {
     path: '',
-    redirectTo: 'loader',
     pathMatch: 'full',
+    redirectTo: 'login' // O AppComponent vai sobrescrever isso se houver usuário
   },
-  // 2. A rota do seu loader que você já tinha criado
   {
     path: 'loader',
     loadComponent: () => import('./pages/loader/loader.page').then(m => m.LoaderPage)
