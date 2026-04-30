@@ -23,7 +23,7 @@ A aplicação centraliza dados de múltiplas lojas, permitindo que o usuário:
 
 * monitore preços em tempo real
 * encontre promoções rapidamente
-* salve seus jogos favoritos na nuvem
+* salve seus jogos favoritos
 
 ---
 
