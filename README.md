@@ -47,6 +47,9 @@ A aplicação centraliza dados de múltiplas lojas, permitindo que o usuário:
 * ✔️ **Tela de Desenvolvedores**
   Identificação criativa da equipe
 
+* ✔️ **Notificações Locais**
+   Alertas de sistema para feedback de login e sincronização de preços usando @capacitor/local-notifications.
+
 ---
 
 ## 🛠️ Tecnologias e Ferramentas
